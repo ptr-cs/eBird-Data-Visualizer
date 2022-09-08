@@ -1,0 +1,19 @@
+﻿<Page
+    x:Class="eBirdDataVisualizer.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    FontFamily="Segoe UI"
+    FontSize="16">
+
+    <Grid x:Name="ContentArea">
+        <StackPanel>
+            <TextBlock Text="What is eBird Data Visualizer?&#10;" FontWeight="SemiBold" FontSize="20"/>
+            <TextBlock Text="eBird Data Visualizer is an application designed to import, view, filter, and export data based on the file formats provided by the eBird project. Visualization and filter options enable specific species or groups of species to be queried." TextWrapping="Wrap"/>
+            <HyperlinkButton NavigateUri="https://ebird.org/" FontSize="16">Link to https://ebird.org/</HyperlinkButton>
+            <TextBlock Text="This app is not associated with the eBird project or the Cornell Lab of Ornithology. It is strictly for non-commerical research and educational purposes.&#10;The sample data provided herein is used to demonstrate application operation and does not constitute a complete dataset." TextWrapping="Wrap"/>
+        </StackPanel>
+    </Grid>
+</Page>

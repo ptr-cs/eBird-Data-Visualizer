@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>eBirdDataVisualizer.Core</RootNamespace>
+    <Platforms>AnyCPU;x64;x86</Platforms>
+    <Platforms>x86;x64;arm64;AnyCPU</Platforms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+</Project>

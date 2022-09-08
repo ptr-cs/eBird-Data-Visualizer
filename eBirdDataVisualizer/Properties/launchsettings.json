@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "eBirdDataVisualizer (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "eBirdDataVisualizer (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}
