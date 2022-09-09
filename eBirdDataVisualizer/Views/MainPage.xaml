@@ -14,6 +14,9 @@
             <TextBlock Text="eBird Data Visualizer is an application designed to import, view, filter, and export data based on the file formats provided by the eBird project. Visualization and filter options enable specific species or groups of species to be queried." TextWrapping="Wrap"/>
             <HyperlinkButton NavigateUri="https://ebird.org/" FontSize="16">Link to https://ebird.org/</HyperlinkButton>
             <TextBlock Text="This app is not associated with the eBird project or the Cornell Lab of Ornithology. It is strictly for non-commerical research and educational purposes.&#10;The sample data provided herein is used to demonstrate application operation and does not constitute a complete dataset." TextWrapping="Wrap"/>
+            <Button Margin="0,16,0,0" Background="#3498DB" x:Name="ImportHistogramDataButton" Click="ImportHistogramDataButton_Click">
+                <TextBlock Text="Import Histogram Data ... " FontSize="16" FontWeight="Bold"/>
+            </Button>
         </StackPanel>
     </Grid>
 </Page>

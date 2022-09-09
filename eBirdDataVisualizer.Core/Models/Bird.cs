@@ -11,9 +11,7 @@ namespace eBirdDataVisualizer.Core.Models;
 /// </summary>
 /// 
 
-
-
-public class Bird
+public class Bird : IComparable
 {
     public int BirdId
     {
@@ -30,9 +28,34 @@ public class Bird
         get; set;
     }
 
+    public double JanuaryQ1
+    {
+        get; set;
+    }
+
+    public double JanuaryQ2
+    {
+        get; set;
+    }
+
+    public double JanuaryQ3
+    {
+        get; set;
+    }
+
+    public double JanuaryQ4
+    {
+        get; set;
+    }
+
     public ICollection<double> Frequency
     {
         get; set;
+    }
+
+    public int CompareTo(object obj)
+    {
+        return BirdId.CompareTo((obj as Bird).BirdId);
     }
 
     public override string ToString() => $"{CommonName} ({ScientificName})";
