@@ -1,14 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using eBirdDataVisualizer.Core.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace eBirdDataVisualizer.Core.Services;
 
-public class BirdDataService
+public interface IBirdDataService
+{
+    public Task<IEnumerable<Bird>> GetGridDataAsync();
+    public void ClearData();
+    public Task<bool> ParseData(string data);
+}
+
+public class BirdDataService : IBirdDataService
 {
     static DataSet DataSet = new DataSet();
     static DataTable Birds = new DataTable(nameof(Birds));
@@ -21,7 +30,7 @@ public class BirdDataService
     static DataColumn JanuaryQ3 = new DataColumn(nameof(JanuaryQ3), typeof(double));
     static DataColumn JanuaryQ4 = new DataColumn(nameof(JanuaryQ4), typeof(double));
 
-    private static List<Bird> allBirds;
+    private static List<Bird> allBirds = new List<Bird>();
 
     static BirdDataService()
     {
@@ -56,6 +65,11 @@ public class BirdDataService
 
     }
 
+    public void ClearData()
+    {
+        DataSet.Clear();
+    }
+
     private static IEnumerable<Bird> AllBirds()
     {
         List<Bird> birds = new List<Bird>();
@@ -72,6 +86,50 @@ public class BirdDataService
                 JanuaryQ2 = (double)frequency[1],
                 JanuaryQ3 = (double)frequency[2],
                 JanuaryQ4 = (double)frequency[3],
+                FebruaryQ1 = (double)frequency[4],
+                FebruaryQ2 = (double)frequency[5],
+                FebruaryQ3 = (double)frequency[6],
+                FebruaryQ4 = (double)frequency[7],
+                MarchQ1 = (double)frequency[8],
+                MarchQ2 = (double)frequency[9],
+                MarchQ3 = (double)frequency[10],
+                MarchQ4 = (double)frequency[11],
+                AprilQ1 = (double)frequency[12],
+                AprilQ2 = (double)frequency[13],
+                AprilQ3 = (double)frequency[14],
+                AprilQ4 = (double)frequency[15],
+                MayQ1 = (double)frequency[16],
+                MayQ2 = (double)frequency[17],
+                MayQ3 = (double)frequency[18],
+                MayQ4 = (double)frequency[19],
+                JuneQ1 = (double)frequency[20],
+                JuneQ2 = (double)frequency[21],
+                JuneQ3 = (double)frequency[22],
+                JuneQ4 = (double)frequency[23],
+                JulyQ1 = (double)frequency[24],
+                JulyQ2 = (double)frequency[25],
+                JulyQ3 = (double)frequency[26],
+                JulyQ4 = (double)frequency[27],
+                AugustQ1 = (double)frequency[28],
+                AugustQ2 = (double)frequency[29],
+                AugustQ3 = (double)frequency[30],
+                AugustQ4 = (double)frequency[31],
+                SeptemberQ1 = (double)frequency[32],
+                SeptemberQ2 = (double)frequency[33],
+                SeptemberQ3 = (double)frequency[34],
+                SeptemberQ4 = (double)frequency[35],
+                OctoberQ1 = (double)frequency[36],
+                OctoberQ2 = (double)frequency[37],
+                OctoberQ3 = (double)frequency[38],
+                OctoberQ4 = (double)frequency[39],
+                NovemberQ1 = (double)frequency[40],
+                NovemberQ2 = (double)frequency[41],
+                NovemberQ3 = (double)frequency[42],
+                NovemberQ4 = (double)frequency[43],
+                DecemberQ1 = (double)frequency[44],
+                DecemberQ2 = (double)frequency[45],
+                DecemberQ3 = (double)frequency[46],
+                DecemberQ4 = (double)frequency[47]
             });
         }
         return birds;
@@ -79,12 +137,48 @@ public class BirdDataService
 
     public async Task<IEnumerable<Bird>> GetGridDataAsync()
     {
-        if (allBirds == null)
-        {
-            allBirds = new List<Bird>(AllBirds());
-        }
+        allBirds = new List<Bird>(AllBirds());
 
         await Task.CompletedTask;
         return allBirds;
+    }
+
+    public async Task<bool> ParseData(string data)
+    {
+        const string frequencyKey = "Frequency of observations in the selected location(s)";
+        const string numberTaxaKey = "Number of taxa";
+        const string sampleSizeKey = "Sample Size";
+
+        bool importResult = false;
+
+        try
+        {
+            // Parse the histogram data text:
+            var lines = data.Trim().Split('\n') // split text into lines
+                .Where(l => l != "") // skip empty lines
+                .SkipWhile(l => !l.Contains(sampleSizeKey)) // skip forward to the line containing sample size data
+                .Skip(1).ToList(); // skip the sample size data line; subsequent lines should be bird entries
+            for (var i = 0; i < lines.Count(); ++i)
+            {
+                // the common name appears first in the data entry:
+                var commonNameSplit = lines[i].Split("(<em class=\"sci\">");
+                // the scientific name appears second in the data entry, between an <em> tag pair:
+                var scientificNameSplit = commonNameSplit.Last().Split("</em>)");
+                var commonName = commonNameSplit.First();
+                var scientificName = scientificNameSplit.First();
+                var frequencyData = scientificNameSplit.Last().Trim().Split('\t').Where(x => x != "").Select(x => System.Convert.ToDouble(x)).ToList();
+
+                Birds.Rows.Add(i, commonName, scientificName, frequencyData);
+            }
+            importResult = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error parsing data: {ex}");
+            importResult = false;
+        }
+
+        await Task.CompletedTask;
+        return importResult;
     }
 }

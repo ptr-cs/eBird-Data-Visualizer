@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" xmlns:views="using:eBirdDataVisualizer.Views"
+    xmlns:wctprimitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives"
     mc:Ignorable="d">
     <Page.Resources>
         <views:DataGridLengthValueConverter x:Key="DataGridLengthValueConverter" />
@@ -31,52 +32,87 @@
             <AppBarButton x:Name="groupButton" Icon="List" Label="Group by">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem x:Name="GroupByGenus" Text="Genus" Click="GroupByGenus_Click"/>
-                        <MenuFlyoutItem x:Name="GroupByCommonName" Text="Common Name" Click="GroupByCommonName_Click"/>
+                        <MenuFlyoutItem x:Name="GroupByGenus" Text="Genus" Command="{x:Bind ViewModel.GroupByGenusCommand}"/>
+                        <MenuFlyoutItem x:Name="GroupByCommonName" Text="Common Name" Command="{x:Bind ViewModel.GroupByCommonNameCommand}"/>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
         </StackPanel>
         <controls:DataGrid
+            Background="#08888888"
             Grid.Row="1"
             AutoGenerateColumns="False"
+            AlternatingRowBackground="#11888888"
+            HorizontalScrollBarVisibility="Visible"
+            VerticalScrollBarVisibility="Visible"
+            HeadersVisibility="Column"
             CanUserSortColumns="True"
-            GridLinesVisibility="Horizontal"
-            ItemsSource="{Binding BirdsCollection}"
+            GridLinesVisibility="All"
+            ItemsSource="{x:Bind ViewModel.ItemsSource, Mode=OneWay}"
             x:Name="frequencyDataGrid"
             IsReadOnly="True"
             Sorting="DataGrid_Sorting"
             LoadingRowGroup="dg_loadingRowGroup" 
             RowGroupHeaderPropertyNameAlternative="Group">
-            <controls:DataGrid.Resources>
-                <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundColor" Color="Transparent" />
-            </controls:DataGrid.Resources>
-            <!--<controls:DataGrid.RowGroupHeaderStyles>
-                <Style TargetType="controls:DataGridRowGroupHeader">
-                    <Setter Property="Background" Value="LightGray" />
+            <controls:DataGrid.ColumnHeaderStyle>
+                <Style TargetType="wctprimitives:DataGridColumnHeader">
+                    <Setter Property="FontSize" Value="16"/>
+                    <!--<Setter Property="FontWeight" Value="Medium"/>-->
                 </Style>
-            </controls:DataGrid.RowGroupHeaderStyles>-->
+            </controls:DataGrid.ColumnHeaderStyle>
             <controls:DataGrid.Columns>
                 <!--<controls:DataGridTextColumn Binding="{Binding BirdId, Mode=OneWay}" Tag="BirdId" Header="Bird Id" x:Name="Column0"/>-->
-                <controls:DataGridTextColumn Binding="{Binding CommonName, Mode=OneWay}" Tag="CommonName" Header="Common Name" x:Name="Column1"/>
-                <controls:DataGridTextColumn Binding="{Binding ScientificName, Mode=OneWay}" Tag="ScientificName" Header="Scientific Name" x:Name="Column2"/>
-                <controls:DataGridTextColumn Binding="{Binding JanuaryQ1, Mode=OneWay}" Header="January Q1" Tag="JanuaryQ1" x:Name="Column3" />
-                <controls:DataGridTextColumn Binding="{Binding JanuaryQ2, Mode=OneWay}" Header="January Q2" Tag="JanuaryQ2" x:Name="Column4"/>
-                <controls:DataGridTextColumn Binding="{Binding JanuaryQ3, Mode=OneWay}" Header="January Q3" Tag="JanuaryQ3" x:Name="Column5" />
-                <controls:DataGridTextColumn Binding="{Binding JanuaryQ4, Mode=OneWay}" Header="January Q4" Tag="JanuaryQ4" x:Name="Column6"/>
-                <!--<controls:DataGridTemplateColumn Header="Frequency" >
-                    <controls:DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ListBox ItemsSource="{Binding Frequency}" >
-                                <ListBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ListBox.ItemsPanel>
-                            </ListBox>
-                        </DataTemplate>
-                    </controls:DataGridTemplateColumn.CellTemplate>
-                </controls:DataGridTemplateColumn>-->
+                <controls:DataGridTextColumn Binding="{Binding CommonName, Mode=OneWay}" Tag="CommonName" Header="Common Name"/>
+                <controls:DataGridTextColumn Binding="{Binding ScientificName, Mode=OneWay}" Tag="ScientificName" Header="Scientific Name"/>
+                <controls:DataGridTextColumn Binding="{Binding JanuaryQ1, Mode=OneWay}" Header="January Q1" Tag="JanuaryQ1" />
+                <controls:DataGridTextColumn Binding="{Binding JanuaryQ2, Mode=OneWay}" Header="January Q2" Tag="JanuaryQ2" />
+                <controls:DataGridTextColumn Binding="{Binding JanuaryQ3, Mode=OneWay}" Header="January Q3" Tag="JanuaryQ3" />
+                <controls:DataGridTextColumn Binding="{Binding JanuaryQ4, Mode=OneWay}" Header="January Q4" Tag="JanuaryQ4" />
+                <controls:DataGridTextColumn Binding="{Binding FebruaryQ1, Mode=OneWay}" Header="February Q1" Tag="FebruaryQ1" />
+                <controls:DataGridTextColumn Binding="{Binding FebruaryQ2, Mode=OneWay}" Header="February Q2" Tag="FebruaryQ2" />
+                <controls:DataGridTextColumn Binding="{Binding FebruaryQ3, Mode=OneWay}" Header="February Q3" Tag="FebruaryQ3" />
+                <controls:DataGridTextColumn Binding="{Binding FebruaryQ4, Mode=OneWay}" Header="February Q4" Tag="FebruaryQ4" />
+                <controls:DataGridTextColumn Binding="{Binding MarchQ1, Mode=OneWay}" Header="March Q1" Tag="MarchQ1" />
+                <controls:DataGridTextColumn Binding="{Binding MarchQ2, Mode=OneWay}" Header="March Q2" Tag="MarchQ2" />
+                <controls:DataGridTextColumn Binding="{Binding MarchQ3, Mode=OneWay}" Header="March Q3" Tag="MarchQ3" />
+                <controls:DataGridTextColumn Binding="{Binding MarchQ4, Mode=OneWay}" Header="March Q4" Tag="MarchQ4" />
+                <controls:DataGridTextColumn Binding="{Binding AprilQ1, Mode=OneWay}" Header="April Q1" Tag="AprilQ1" />
+                <controls:DataGridTextColumn Binding="{Binding AprilQ2, Mode=OneWay}" Header="April Q2" Tag="AprilQ2" />
+                <controls:DataGridTextColumn Binding="{Binding AprilQ3, Mode=OneWay}" Header="April Q3" Tag="AprilQ3" />
+                <controls:DataGridTextColumn Binding="{Binding AprilQ4, Mode=OneWay}" Header="April Q4" Tag="AprilQ4" />
+                <controls:DataGridTextColumn Binding="{Binding MayQ1, Mode=OneWay}" Header="May Q1" Tag="MayQ1" />
+                <controls:DataGridTextColumn Binding="{Binding MayQ2, Mode=OneWay}" Header="May Q2" Tag="MayQ2" />
+                <controls:DataGridTextColumn Binding="{Binding MayQ3, Mode=OneWay}" Header="May Q3" Tag="MayQ3" />
+                <controls:DataGridTextColumn Binding="{Binding MayQ4, Mode=OneWay}" Header="May Q4" Tag="MayQ4" />
+                <controls:DataGridTextColumn Binding="{Binding JuneQ1, Mode=OneWay}" Header="June Q1" Tag="JuneQ1" />
+                <controls:DataGridTextColumn Binding="{Binding JuneQ2, Mode=OneWay}" Header="June Q2" Tag="JuneQ2" />
+                <controls:DataGridTextColumn Binding="{Binding JuneQ3, Mode=OneWay}" Header="June Q3" Tag="JuneQ3" />
+                <controls:DataGridTextColumn Binding="{Binding JuneQ4, Mode=OneWay}" Header="June Q4" Tag="JuneQ4" />
+                <controls:DataGridTextColumn Binding="{Binding JulyQ1, Mode=OneWay}" Header="July Q1" Tag="JulyQ1" />
+                <controls:DataGridTextColumn Binding="{Binding JulyQ2, Mode=OneWay}" Header="July Q2" Tag="JulyQ2" />
+                <controls:DataGridTextColumn Binding="{Binding JulyQ3, Mode=OneWay}" Header="July Q3" Tag="JulyQ3" />
+                <controls:DataGridTextColumn Binding="{Binding JulyQ4, Mode=OneWay}" Header="July Q4" Tag="JulyQ4" />
+                <controls:DataGridTextColumn Binding="{Binding AugustQ1, Mode=OneWay}" Header="August Q1" Tag="AugustQ1" />
+                <controls:DataGridTextColumn Binding="{Binding AugustQ2, Mode=OneWay}" Header="August Q2" Tag="AugustQ2" />
+                <controls:DataGridTextColumn Binding="{Binding AugustQ3, Mode=OneWay}" Header="August Q3" Tag="AugustQ3" />
+                <controls:DataGridTextColumn Binding="{Binding AugustQ4, Mode=OneWay}" Header="August Q4" Tag="AugustQ4" />
+                <controls:DataGridTextColumn Binding="{Binding SeptemberQ1, Mode=OneWay}" Header="September Q1" Tag="SeptemberQ1" />
+                <controls:DataGridTextColumn Binding="{Binding SeptemberQ2, Mode=OneWay}" Header="September Q2" Tag="SeptemberQ2" />
+                <controls:DataGridTextColumn Binding="{Binding SeptemberQ3, Mode=OneWay}" Header="September Q3" Tag="SeptemberQ3" />
+                <controls:DataGridTextColumn Binding="{Binding SeptemberQ4, Mode=OneWay}" Header="September Q4" Tag="SeptemberQ4" />
+                <controls:DataGridTextColumn Binding="{Binding OctoberQ1, Mode=OneWay}" Header="October Q1" Tag="OctoberQ1" />
+                <controls:DataGridTextColumn Binding="{Binding OctoberQ2, Mode=OneWay}" Header="October Q2" Tag="OctoberQ2" />
+                <controls:DataGridTextColumn Binding="{Binding OctoberQ3, Mode=OneWay}" Header="October Q3" Tag="OctoberQ3" />
+                <controls:DataGridTextColumn Binding="{Binding OctoberQ4, Mode=OneWay}" Header="October Q4" Tag="OctoberQ4" />
+                <controls:DataGridTextColumn Binding="{Binding NovemberQ1, Mode=OneWay}" Header="November Q1" Tag="NovemberQ1" />
+                <controls:DataGridTextColumn Binding="{Binding NovemberQ2, Mode=OneWay}" Header="November Q2" Tag="NovemberQ2" />
+                <controls:DataGridTextColumn Binding="{Binding NovemberQ3, Mode=OneWay}" Header="November Q3" Tag="NovemberQ3" />
+                <controls:DataGridTextColumn Binding="{Binding NovemberQ4, Mode=OneWay}" Header="November Q4" Tag="NovemberQ4" />
+                <controls:DataGridTextColumn Binding="{Binding DecemberQ1, Mode=OneWay}" Header="December Q1" Tag="DecemberQ1" />
+                <controls:DataGridTextColumn Binding="{Binding DecemberQ2, Mode=OneWay}" Header="December Q2" Tag="DecemberQ2" />
+                <controls:DataGridTextColumn Binding="{Binding DecemberQ3, Mode=OneWay}" Header="December Q3" Tag="DecemberQ3" />
+                <controls:DataGridTextColumn Binding="{Binding DecemberQ4, Mode=OneWay}" Header="December Q4" Tag="DecemberQ4" />
+
             </controls:DataGrid.Columns>
         </controls:DataGrid>
     </Grid>

@@ -1,30 +1,80 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Windows.Input;
 using ColorCode.Common;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.UI.Controls;
 using eBirdDataVisualizer.Contracts.ViewModels;
 using eBirdDataVisualizer.Core.Contracts.Services;
 using eBirdDataVisualizer.Core.Models;
 using eBirdDataVisualizer.Core.Services;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 
 namespace eBirdDataVisualizer.ViewModels;
 
 public class DataGridViewModel : ObservableRecipient, INavigationAware
 {
-    private readonly BirdDataService birdDataService = new BirdDataService();
+    private readonly IBirdDataService _birdDataService;
 
     public ObservableCollection<Bird> BirdsCollection { get; set; } = new ObservableCollection<Bird>();
     public CollectionViewSource BirdsCollectionViewSource { get; set; }
-    public ICollectionView BirdsCollectionView { get; set; }
+
+    private ICollectionView itemsSource;
+    public ICollectionView ItemsSource
+    {
+        get => itemsSource;
+        set => SetProperty(ref itemsSource, value);
+    }
+
+    public ICommand GroupByGenusCommand
+    {
+        get;
+    }
+
+    public ICommand GroupByCommonNameCommand
+    {
+        get;
+    }
 
     private static CollectionViewSource groupedItems;
 
-    public DataGridViewModel()
+    public DataGridViewModel(IBirdDataService birdDataService)
     {
+        _birdDataService = birdDataService;
         BirdsCollectionViewSource = new CollectionViewSource() { Source = BirdsCollection };
-        BirdsCollectionView = BirdsCollectionViewSource.View;
+
+        GroupByGenusCommand = new RelayCommand(() =>
+        {
+            if (CachedGroupQuery != nameof(KeySelectorGenus))
+            {
+                CachedGroupQuery = nameof(KeySelectorGenus);
+                ItemsSource = GroupDataByGenus().View;
+            }
+            else
+            {
+                CreateDefaultView();
+                CachedGroupQuery = "";
+                return;
+            }
+        });
+
+        GroupByCommonNameCommand = new RelayCommand(() =>
+        {
+            if (CachedGroupQuery != nameof(KeySelectorCommonName))
+            {
+                CachedGroupQuery = nameof(KeySelectorCommonName);
+                ItemsSource = GroupDataByCommonName().View;
+            }
+            else
+            {
+                CreateDefaultView();
+                CachedGroupQuery = "";
+                return;
+            }
+        });
     }
 
     // Sorting implementation using LINQ
@@ -48,61 +98,45 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
         BirdsCollection.Clear();
 
         // TODO: Replace with real data.
-        var data = await birdDataService.GetGridDataAsync();
+        var data = await _birdDataService.GetGridDataAsync();
 
         foreach (var item in data)
         {
             BirdsCollection.Add(item);
         }
+        BirdsCollectionViewSource = new CollectionViewSource() { Source = BirdsCollection };
+        ItemsSource = BirdsCollectionViewSource.View;
+    }
+
+    public void CreateDefaultView()
+    {
+        BirdsCollectionViewSource = new CollectionViewSource() { Source = BirdsCollection };
+        ItemsSource = BirdsCollectionViewSource.View;
     }
 
     public void OnNavigatedFrom()
     {
     }
 
+    /// <summary>
+    /// SortData function that uses a DataGrid Column's Tag as the OrderBy keySelector.
+    /// Note that the tag must exactly match the name of a property in the type being sorted.
+    /// </summary>
+    /// <param name="sortBy"></param>
+    /// <param name="ascending"></param>
+    /// <returns></returns>
     public ObservableCollection<Bird> SortData(string sortBy, bool ascending)
     {
         _cachedSortedColumn = sortBy;
-        switch (sortBy)
-        {
-            case "BirdId":
-                if (ascending)
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderBy(bird => bird.BirdId));
-                else
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderByDescending(bird => bird.BirdId));
-            case "CommonName":
-                if (ascending)
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderBy(bird => bird.CommonName));
-                else
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderByDescending(bird => bird.CommonName));
-            case "ScientificName":
-                if (ascending)
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderBy(bird => bird.ScientificName));
-                else
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderByDescending(bird => bird.ScientificName));
-            case "JanuaryQ1":
-                if (ascending)
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderBy(bird => bird.JanuaryQ1));
-                else
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderByDescending(bird => bird.JanuaryQ1));
-            case "JanuaryQ2":
-                if (ascending)
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderBy(bird => bird.JanuaryQ2));
-                else
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderByDescending(bird => bird.JanuaryQ2));
-            case "JanuaryQ3":
-                if (ascending)
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderBy(bird => bird.JanuaryQ3));
-                else
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderByDescending(bird => bird.JanuaryQ3));
-            case "JanuaryQ4":
-                if (ascending)
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderBy(bird => bird.JanuaryQ4));
-                else
-                    return new ObservableCollection<Bird>(BirdsCollection.OrderByDescending(bird => bird.JanuaryQ4));
-        }
 
-        return BirdsCollection;
+        var propertyInfo = typeof(Bird).GetProperty(sortBy);
+        if (propertyInfo == null)
+            return BirdsCollection;
+
+        if (ascending)
+            return new ObservableCollection<Bird>(BirdsCollection.OrderBy(bird => propertyInfo.GetValue(bird, null)));
+        else
+            return new ObservableCollection<Bird>(BirdsCollection.OrderByDescending(bird => propertyInfo.GetValue(bird, null)));
     }
 
     public string keySelector(Bird bird)
@@ -111,7 +145,11 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
     }
 
     public Func<Bird, string> KeySelectorGenus = new (item => item.ScientificName.Split(' ').First());
-    public Func<Bird, string> KeySelectorCommonName = new(item => item.CommonName.Split(' ').Last());
+    public Func<Bird, string> KeySelectorCommonName = new(item => item.CommonName.Trim()
+        .Split(' ')
+        .TakeWhile(x => !x.Contains('(') && !x.Contains("sp.")) // Stop at the first string that contains either '(' or "sp."
+        .Select(x => Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(x)) // Adjust capitalization to unify group name
+        .Last()); // Select the last item remaining, which should be the type of bird (Goose, Duck, etc.)
 
     public CollectionViewSource GroupDataByGenus()
     {

@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 using eBirdDataVisualizer.Contracts.Services;
+using eBirdDataVisualizer.Core.Services;
 using eBirdDataVisualizer.Helpers;
 
 using Microsoft.UI.Xaml;
@@ -16,6 +17,7 @@ namespace eBirdDataVisualizer.ViewModels;
 public class SettingsViewModel : ObservableRecipient
 {
     private readonly IThemeSelectorService _themeSelectorService;
+    private readonly IBirdDataService _birdDataService;
     private ElementTheme _elementTheme;
     private string _versionDescription;
 
@@ -36,9 +38,15 @@ public class SettingsViewModel : ObservableRecipient
         get;
     }
 
-    public SettingsViewModel(IThemeSelectorService themeSelectorService)
+    public ICommand ClearBirdDataCommand
+    {
+        get;
+    }
+
+    public SettingsViewModel(IThemeSelectorService themeSelectorService, IBirdDataService birdDataService)
     {
         _themeSelectorService = themeSelectorService;
+        _birdDataService = birdDataService;
         _elementTheme = _themeSelectorService.Theme;
         _versionDescription = GetVersionDescription();
 
@@ -51,6 +59,11 @@ public class SettingsViewModel : ObservableRecipient
                     await _themeSelectorService.SetThemeAsync(param);
                 }
             });
+
+        ClearBirdDataCommand = new RelayCommand(() =>
+        {
+            _birdDataService.ClearData();
+        });
     }
 
     private static string GetVersionDescription()

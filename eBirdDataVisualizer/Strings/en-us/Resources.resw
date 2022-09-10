@@ -77,7 +77,7 @@
     <value>ContentGrid</value>
   </data>
   <data name="Shell_DataGrid.Content" xml:space="preserve">
-    <value>Frequency Data</value>
+    <value>Histogram Data</value>
   </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
     <value>Personalization</value>

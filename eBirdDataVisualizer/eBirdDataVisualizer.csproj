@@ -4,7 +4,7 @@
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>eBirdDataVisualizer</RootNamespace>
-    <ApplicationIcon>Assets/WindowIcon.ico</ApplicationIcon>
+    <ApplicationIcon>bird.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x86;x64;arm64</Platforms>
     <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
@@ -13,10 +13,34 @@
 	<Nullable>enable</Nullable>
 	<UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
+    <PackageIcon>bird.png</PackageIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="Assets\17655-bird-flying.json" />
+    <Content Remove="Assets\flyingBird.cs" />
+    <Content Remove="Assets\green-leaf-trees-904807.jpg" />
+    <Content Remove="Assets\jungle.jpg" />
+    <Content Remove="Assets\Lottie Simple License.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\17655-bird-flying.json" />
+    <None Remove="Assets\bird.ico" />
+    <None Remove="Assets\bird.png" />
+    <None Remove="Assets\jungle.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bird.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\Pictures\bird.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

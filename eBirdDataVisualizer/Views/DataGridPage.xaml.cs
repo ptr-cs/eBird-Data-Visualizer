@@ -40,25 +40,6 @@ public sealed partial class DataGridPage : Page
         InitializeComponent();
     }
 
-
-    private void GroupByGenus_Click(object sender, RoutedEventArgs e)
-    {
-        if (frequencyDataGrid != null)
-        {
-            ViewModel.CachedGroupQuery = "Genus";
-            frequencyDataGrid.ItemsSource = ViewModel.GroupDataByGenus().View;
-        }
-    }
-
-    private void GroupByCommonName_Click(object sender, RoutedEventArgs e)
-    {
-        if (frequencyDataGrid != null)
-        {
-            ViewModel.CachedGroupQuery = "Common Name";
-            frequencyDataGrid.ItemsSource = ViewModel.GroupDataByCommonName().View;
-        }
-    }
-
     private void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
     {
         // Clear previous sorted column if we start sorting a different column
@@ -106,10 +87,10 @@ public sealed partial class DataGridPage : Page
 
         switch (ViewModel.CachedGroupQuery)
         {
-            case "Genus":
+            case nameof(ViewModel.KeySelectorGenus):
                 e.RowGroupHeader.PropertyValue = ViewModel.KeySelectorGenus(bird);
                 break;
-            case "Common Name":
+            case nameof(ViewModel.KeySelectorCommonName):
                 e.RowGroupHeader.PropertyValue = ViewModel.KeySelectorCommonName(bird);
                 break;
             default:
