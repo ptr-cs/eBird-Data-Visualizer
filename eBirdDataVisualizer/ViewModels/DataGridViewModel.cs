@@ -15,12 +15,133 @@ using Microsoft.UI.Xaml.Data;
 
 namespace eBirdDataVisualizer.ViewModels;
 
+public enum Month
+{
+    January = 0,
+    February = 1,
+    March = 2,
+    April = 3,
+    May = 4,
+    June = 5,
+    July = 6,
+    August = 7,
+    September = 8,
+    October = 9,
+    November = 10,
+    December = 11
+}
+
 public class DataGridViewModel : ObservableRecipient, INavigationAware
 {
     private readonly IBirdDataService _birdDataService;
 
     public ObservableCollection<Bird> BirdsCollection { get; set; } = new ObservableCollection<Bird>();
     public CollectionViewSource BirdsCollectionViewSource { get; set; }
+
+    private bool isJanuaryVisible = true;
+    public bool IsJanuaryVisible
+    {
+        get => isJanuaryVisible;
+        set => SetProperty(ref isJanuaryVisible, value);
+    }
+
+    private bool isFebruaryVisible = true;
+    public bool IsFebruaryVisible
+    {
+        get => isFebruaryVisible;
+        set => SetProperty(ref isFebruaryVisible, value);
+    }
+
+    private bool isMarchVisible = true;
+    public bool IsMarchVisible
+    {
+        get => isMarchVisible;
+        set => SetProperty(ref isMarchVisible, value);
+    }
+
+    private bool isAprilVisible = true;
+    public bool IsAprilVisible
+    {
+        get => isAprilVisible;
+        set => SetProperty(ref isAprilVisible, value);
+    }
+
+    private bool isMayVisible = true;
+    public bool IsMayVisible
+    {
+        get => isMayVisible;
+        set => SetProperty(ref isMayVisible, value);
+    }
+
+    private bool isJuneVisible = true;
+    public bool IsJuneVisible
+    {
+        get => isJuneVisible;
+        set => SetProperty(ref isJuneVisible, value);
+    }
+
+    private bool isJulyVisible = true;
+    public bool IsJulyVisible
+    {
+        get => isJulyVisible;
+        set => SetProperty(ref isJulyVisible, value);
+    }
+
+    private bool isAugustVisible = true;
+    public bool IsAugustVisible
+    {
+        get => isAugustVisible;
+        set => SetProperty(ref isAugustVisible, value);
+    }
+
+    private bool isSeptemberVisible = true;
+    public bool IsSeptemberVisible
+    {
+        get => isSeptemberVisible;
+        set => SetProperty(ref isSeptemberVisible, value);
+    }
+
+    private bool isOctoberVisible = true;
+    public bool IsOctoberVisible
+    {
+        get => isOctoberVisible;
+        set => SetProperty(ref isOctoberVisible, value);
+    }
+
+    private bool isNovemberVisible = true;
+    public bool IsNovemberVisible
+    {
+        get => isNovemberVisible;
+        set => SetProperty(ref isNovemberVisible, value);
+    }
+
+    private bool isDecemberVisible = true;
+    public bool IsDecemberVisible
+    {
+        get => isDecemberVisible;
+        set => SetProperty(ref isDecemberVisible, value);
+    }
+
+    private bool? areAllMonthsVisible = true;
+    public bool? AreAllMonthsVisible
+    {
+        get => areAllMonthsVisible;
+        set => SetProperty(ref areAllMonthsVisible, value);
+    }
+
+    private bool isDataGridBarChartMode = false;
+    public bool IsDataGridBarChartMode
+    {
+        get => isDataGridBarChartMode;
+        set => SetProperty(ref isDataGridBarChartMode, value);
+    }
+
+    private string dataGridModeLabel = "Grid";
+    public string DataGridModeLabel
+    {
+        get => dataGridModeLabel;
+        set => SetProperty(ref dataGridModeLabel, value);
+    }
 
     private ICollectionView itemsSource;
     public ICollectionView ItemsSource
@@ -39,7 +160,54 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
         get;
     }
 
+    public ICommand ToggleMonthVisibility
+    {
+        get;
+    }
+
+    public ICommand ToggleAllMonthsVisibility
+    {
+        get;
+    }
+
+    public ICommand ToggleIsDataGridBarChartMode
+    {
+        get;
+    }
+
     private static CollectionViewSource groupedItems;
+
+    public bool MonthsAllVisible()
+    {
+        return IsJanuaryVisible &&
+        IsFebruaryVisible &&
+        IsMarchVisible &&
+        IsAprilVisible &&
+        IsMayVisible &&
+        IsJuneVisible &&
+        IsJulyVisible &&
+        IsAugustVisible &&
+        IsSeptemberVisible &&
+        IsOctoberVisible &&
+        IsNovemberVisible &&
+        IsDecemberVisible;
+    }
+
+    public bool AtLeastOneMonthVisible()
+    {
+        return IsJanuaryVisible ||
+        IsFebruaryVisible ||
+        IsMarchVisible ||
+        IsAprilVisible ||
+        IsMayVisible ||
+        IsJuneVisible ||
+        IsJulyVisible ||
+        IsAugustVisible ||
+        IsSeptemberVisible ||
+        IsOctoberVisible ||
+        IsNovemberVisible ||
+        IsDecemberVisible;
+    }
 
     public DataGridViewModel(IBirdDataService birdDataService)
     {
@@ -74,6 +242,99 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
                 CachedGroupQuery = "";
                 return;
             }
+        });
+
+        ToggleMonthVisibility = new RelayCommand<Month>((param) =>
+        {
+            switch (param)
+            {
+                case Month.January:
+                    IsJanuaryVisible = !IsJanuaryVisible;
+                    break;
+                case Month.February:
+                    IsFebruaryVisible = !IsFebruaryVisible;
+                    break;
+                case Month.March:
+                    IsMarchVisible = !IsMarchVisible;
+                    break;
+                case Month.April:
+                    IsAprilVisible = !IsAprilVisible;
+                    break;
+                case Month.May:
+                    IsMayVisible = !IsMayVisible;
+                    break;
+                case Month.June:
+                    IsJuneVisible = !IsJuneVisible;
+                    break;
+                case Month.July:
+                    IsJulyVisible = !IsJulyVisible;
+                    break;
+                case Month.August:
+                    IsAugustVisible = !IsAugustVisible;
+                    break;
+                case Month.September:
+                    IsSeptemberVisible = !IsSeptemberVisible;
+                    break;
+                case Month.October:
+                    IsOctoberVisible = !IsOctoberVisible;
+                    break;
+                case Month.November:
+                    IsNovemberVisible = !IsNovemberVisible;
+                    break;
+                case Month.December:
+                    IsDecemberVisible = !IsDecemberVisible;
+                    break;
+            }
+
+            if (MonthsAllVisible())
+                AreAllMonthsVisible = true;
+            else if (AtLeastOneMonthVisible())
+                AreAllMonthsVisible = null;
+            else
+                AreAllMonthsVisible = false;
+        });
+
+        ToggleAllMonthsVisibility = new RelayCommand(() =>
+        {
+            AreAllMonthsVisible = (AreAllMonthsVisible == true || AreAllMonthsVisible == null) ? false : true;
+
+            if (AreAllMonthsVisible == true)
+            {
+                IsJanuaryVisible =
+                IsFebruaryVisible =
+                IsMarchVisible =
+                IsAprilVisible =
+                IsMayVisible =
+                IsJuneVisible =
+                IsJulyVisible =
+                IsAugustVisible =
+                IsSeptemberVisible =
+                IsOctoberVisible =
+                IsNovemberVisible =
+                IsDecemberVisible = true;
+            }
+            else if (AreAllMonthsVisible == false)
+            {
+                IsJanuaryVisible =
+                IsFebruaryVisible =
+                IsMarchVisible =
+                IsAprilVisible =
+                IsMayVisible =
+                IsJuneVisible =
+                IsJulyVisible =
+                IsAugustVisible =
+                IsSeptemberVisible =
+                IsOctoberVisible =
+                IsNovemberVisible =
+                IsDecemberVisible = false;
+            }
+        });
+
+        ToggleIsDataGridBarChartMode = new RelayCommand(() =>
+        {
+            IsDataGridBarChartMode = !IsDataGridBarChartMode;
+
+            DataGridModeLabel = (IsDataGridBarChartMode) ? "Bar Chart" : "Grid";
         });
     }
 
