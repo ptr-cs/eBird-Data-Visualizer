@@ -1,5 +1,7 @@
 # eBird Data Visualizer
 
+![eBird Data Visualizer screenshot](/media/eBird-Data-Visualizer.png "eBird Data Visualizer screenshot")
+
 ## What is eBird Data Visualizer?
 
 eBird Data Visualizer is a WinUI 3 application designed to import, view, filter, and export data based on the file formats provided by the eBird project.
