@@ -36,6 +36,28 @@ public class BarChartValueHeightConverter : IValueConverter
     }
 }
 
+public class HistogramViewTypeComparisonConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        HistogramViewType view = (HistogramViewType)value;
+        HistogramViewType param;
+        string parsed = parameter.ToString();
+        if (parsed == "Bars")
+            param = HistogramViewType.Bars;
+        else if (parsed == "Values")
+            param = HistogramViewType.Values;
+        else
+            return false;
+
+        return (view == param) ? Visibility.Visible : Visibility.Collapsed;
+    }
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        return HistogramViewType.Values;
+    }
+}
+
 // TODO: Change the grid as appropriate for your app. Adjust the column definitions on DataGridPage.xaml.
 // For more details, see the documentation at https://docs.microsoft.com/windows/communitytoolkit/controls/datagrid.
 public sealed partial class DataGridPage : Page
@@ -54,11 +76,13 @@ public sealed partial class DataGridPage : Page
 
     private void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
     {
+        DataGrid dg = (DataGrid)sender;
+
         // Clear previous sorted column if we start sorting a different column
-        string previousSortedColumn = ViewModel.CachedSortedColumn;
+        string previousSortedColumn = ViewModel.CachedSortedColumn.Item1;
         if (previousSortedColumn != string.Empty)
         {
-            foreach (DataGridColumn dataGridColumn in frequencyDataGrid.Columns)
+            foreach (DataGridColumn dataGridColumn in dg.Columns)
             {
                 if (dataGridColumn.Tag != null && dataGridColumn.Tag.ToString() == previousSortedColumn &&
                     (e.Column.Tag == null || previousSortedColumn != e.Column.Tag.ToString()))
@@ -73,17 +97,17 @@ public sealed partial class DataGridPage : Page
         {
             if (e.Column.SortDirection == null)
             {
-                frequencyDataGrid.ItemsSource = ViewModel.SortData(e.Column.Tag.ToString(), true);
+                dg.ItemsSource = ViewModel.SortData(e.Column.Tag.ToString(), true).View;
                 e.Column.SortDirection = DataGridSortDirection.Ascending;
             }
             else if (e.Column.SortDirection == DataGridSortDirection.Ascending)
             {
-                frequencyDataGrid.ItemsSource = ViewModel.SortData(e.Column.Tag.ToString(), false);
+                dg.ItemsSource = ViewModel.SortData(e.Column.Tag.ToString(), false).View;
                 e.Column.SortDirection = DataGridSortDirection.Descending;
             }
             else
             {
-                frequencyDataGrid.ItemsSource = ViewModel.FilterData(DataGridViewModel.FilterOptions.All);
+                dg.ItemsSource = ViewModel.FilterData(DataGridViewModel.FilterOptions.All);
                 e.Column.SortDirection = null;
             }
         }

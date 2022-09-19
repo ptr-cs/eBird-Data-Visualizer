@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Windows.Input;
 using ColorCode.Common;
@@ -29,6 +30,12 @@ public enum Month
     October = 9,
     November = 10,
     December = 11
+}
+
+public enum HistogramViewType
+{
+    Values= 0,
+    Bars = 1
 }
 
 public class DataGridViewModel : ObservableRecipient, INavigationAware
@@ -129,8 +136,8 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
         set => SetProperty(ref areAllMonthsVisible, value);
     }
 
-    private bool isDataGridBarChartMode = false;
-    public bool IsDataGridBarChartMode
+    private HistogramViewType isDataGridBarChartMode = HistogramViewType.Values;
+    public HistogramViewType DataGridBarChartMode
     {
         get => isDataGridBarChartMode;
         set => SetProperty(ref isDataGridBarChartMode, value);
@@ -170,7 +177,7 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
         get;
     }
 
-    public ICommand ToggleIsDataGridBarChartMode
+    public ICommand ToggleDataGridBarChartMode
     {
         get;
     }
@@ -218,7 +225,6 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
         {
             if (CachedGroupQuery != nameof(KeySelectorGenus))
             {
-                CachedGroupQuery = nameof(KeySelectorGenus);
                 ItemsSource = GroupDataByGenus().View;
             }
             else
@@ -233,7 +239,6 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
         {
             if (CachedGroupQuery != nameof(KeySelectorCommonName))
             {
-                CachedGroupQuery = nameof(KeySelectorCommonName);
                 ItemsSource = GroupDataByCommonName().View;
             }
             else
@@ -330,17 +335,15 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
             }
         });
 
-        ToggleIsDataGridBarChartMode = new RelayCommand(() =>
+        ToggleDataGridBarChartMode = new RelayCommand<HistogramViewType>((param) =>
         {
-            IsDataGridBarChartMode = !IsDataGridBarChartMode;
-
-            DataGridModeLabel = (IsDataGridBarChartMode) ? "Bar Chart" : "Grid";
+            DataGridBarChartMode = param;
         });
     }
 
     // Sorting implementation using LINQ
-    private string _cachedSortedColumn = string.Empty;
-    public string CachedSortedColumn
+    private Tuple<string, bool>  _cachedSortedColumn = new Tuple<string, bool>(string.Empty, false);
+    public Tuple<string, bool> CachedSortedColumn
     {
         get => _cachedSortedColumn;
         set => _cachedSortedColumn = value;
@@ -386,18 +389,39 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
     /// <param name="sortBy"></param>
     /// <param name="ascending"></param>
     /// <returns></returns>
-    public ObservableCollection<Bird> SortData(string sortBy, bool ascending)
+    public CollectionViewSource SortData(string sortBy, bool ascending)
     {
-        _cachedSortedColumn = sortBy;
+        CachedSortedColumn = new Tuple<string, bool>(sortBy, ascending);
+        CachedGroupQuery = String.Empty;
+        //_cachedGroupQuery = string.Empty;
+
+        CollectionViewSource collectionViewSource = new();
 
         var propertyInfo = typeof(Bird).GetProperty(sortBy);
         if (propertyInfo == null)
-            return BirdsCollection;
+        {
+            collectionViewSource.Source = BirdsCollection;
+            return collectionViewSource;
+        }
+
+        //if (CachedGroupQuery != string.Empty)
+        //{
+        //    switch (CachedGroupQuery)
+        //    {
+        //        case nameof(KeySelectorGenus):
+        //            return GroupDataByGenus();
+        //        case nameof(KeySelectorCommonName):
+        //            return GroupDataByCommonName();
+        //        default:
+        //            break;
+        //    }
+        //}
 
         if (ascending)
-            return new ObservableCollection<Bird>(BirdsCollection.OrderBy(bird => propertyInfo.GetValue(bird, null)));
+            collectionViewSource.Source = new ObservableCollection<Bird>(BirdsCollection.OrderBy(bird => propertyInfo.GetValue(bird, null)));
         else
-            return new ObservableCollection<Bird>(BirdsCollection.OrderByDescending(bird => propertyInfo.GetValue(bird, null)));
+            collectionViewSource.Source = new ObservableCollection<Bird>(BirdsCollection.OrderByDescending(bird => propertyInfo.GetValue(bird, null)));
+        return collectionViewSource;
     }
 
     public string keySelector(Bird bird)
@@ -414,11 +438,15 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
 
     public CollectionViewSource GroupDataByGenus()
     {
+        CachedGroupQuery = nameof(KeySelectorGenus);
+        // bool? sort = (CachedSortedColumn.Item1 == string.Empty) ? null : CachedSortedColumn.Item2;
         return GroupData(BirdsCollection, KeySelectorGenus);
     }
 
     public CollectionViewSource GroupDataByCommonName()
     {
+        CachedGroupQuery = nameof(KeySelectorCommonName);
+        // bool? sort = (CachedSortedColumn.Item1 == string.Empty) ? null : CachedSortedColumn.Item2;
         return GroupData(BirdsCollection, KeySelectorCommonName);
     }
 
@@ -435,6 +463,8 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
         {
             GroupInfoCollection<Bird> info = new GroupInfoCollection<Bird>();
             info.Key = g.GroupName;
+
+
             foreach (var item in g.Items)
             {
                 info.Add(item);
@@ -445,7 +475,13 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
 
         groupedItems = new CollectionViewSource();
         groupedItems.IsSourceGrouped = true;
-        groupedItems.Source = groups;
+
+        //if (CachedSortedColumn.Item1 != string.Empty)
+        //    groupedItems.Source = (CachedSortedColumn.Item2 == true) ? groups.OrderBy(x => x.Key) : groups.OrderByDescending(x => x.Key);
+        //else
+        //    groupedItems.Source = groups;
+
+        groupedItems.Source = groups.OrderBy(x => x.Key);
 
         return groupedItems;
     }

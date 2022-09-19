@@ -14,6 +14,8 @@
     <Page.Resources>
         <views:DataGridLengthValueConverter x:Key="DataGridLengthValueConverter" />
         <views:BarChartValueHeightConverter x:Key="BarChartValueHeightConverter" />
+        <views:HistogramViewTypeComparisonConverter x:Key="HistogramViewTypeComparisonConverter"/>
+
     </Page.Resources>
     <Grid x:Name="ContentArea">
         <Grid.RowDefinitions>
@@ -34,6 +36,14 @@
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>-->
+            <AppBarButton x:Name="formatButton" Icon="View" Label="Data View">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem x:Name="ViewValues" Text="Values" Command="{x:Bind ViewModel.ToggleDataGridBarChartMode}" CommandParameter="{x:Bind viewModels:HistogramViewType.Values}"/>
+                        <MenuFlyoutItem x:Name="ViewBars" Text="Bars" Command="{x:Bind ViewModel.ToggleDataGridBarChartMode}" CommandParameter="{x:Bind viewModels:HistogramViewType.Bars}"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
             <AppBarButton x:Name="groupButton" Icon="List" Label="Group by">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
@@ -75,8 +85,806 @@
             HeadersVisibility="Column"
             CanUserSortColumns="True"
             GridLinesVisibility="All"
+            Visibility="{x:Bind ViewModel.DataGridBarChartMode, Mode=OneWay, Converter={StaticResource HistogramViewTypeComparisonConverter}, ConverterParameter=Bars}"
             ItemsSource="{x:Bind ViewModel.ItemsSource, Mode=OneWay}"
-            x:Name="frequencyDataGrid"
+            IsReadOnly="True"
+            Sorting="DataGrid_Sorting"
+            LoadingRowGroup="dg_loadingRowGroup" 
+            RowGroupHeaderPropertyNameAlternative="Group">
+            <controls:DataGrid.ColumnHeaderStyle>
+                <Style TargetType="wctprimitives:DataGridColumnHeader">
+                    <Setter Property="FontSize" Value="16"/>
+                    <!--<Setter Property="Padding" Value="0"/>-->
+                    <!--<Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="wctprimitives:DataGridColumnHeader">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>-->
+                </Style>
+            </controls:DataGrid.ColumnHeaderStyle>
+            
+            <controls:DataGrid.Resources>
+                <ResourceDictionary>
+                    <ResourceDictionary.ThemeDictionaries>
+                        <ResourceDictionary x:Key="Default">
+                            <SolidColorBrush x:Key="InvalidBrush" Color="#FFFF00"/>
+                            <SolidColorBrush x:Key="FillerGridLinesBrush" Color="Transparent"/>
+                            <StaticResource x:Key="ScrollBarsSeparatorBackground" ResourceKey="SystemControlPageBackgroundChromeLowBrush"/>
+                            <StaticResource x:Key="DataGridColumnHeaderForegroundBrush" ResourceKey="SystemControlForegroundBaseMediumBrush"/>
+                            <StaticResource x:Key="DataGridColumnHeaderBackgroundColor" ResourceKey="SystemAltHighColor"/>
+                            <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{StaticResource DataGridColumnHeaderBackgroundColor}"/>
+                            <StaticResource x:Key="DataGridColumnHeaderHoveredBackgroundColor" ResourceKey="SystemListLowColor"/>
+                            <StaticResource x:Key="DataGridColumnHeaderPressedBackgroundColor" ResourceKey="SystemListMediumColor"/>
+                            <StaticResource x:Key="DataGridColumnHeaderDraggedBackgroundBrush" ResourceKey="SystemControlBackgroundChromeMediumLowBrush"/>
+                            <StaticResource x:Key="DataGridColumnHeaderPointerOverBrush" ResourceKey="SystemControlHighlightListLowBrush"/>
+                            <StaticResource x:Key="DataGridColumnHeaderPressedBrush" ResourceKey="SystemControlHighlightListMediumBrush"/>
+                        </ResourceDictionary>
+                        <ResourceDictionary x:Key="HighContrast">
+                            <SolidColorBrush x:Key="InvalidBrush" Color="#FFFF00"/>
+                            <SolidColorBrush x:Key="FillerGridLinesBrush" Color="Transparent"/>
+                            <StaticResource x:Key="ScrollBarsSeparatorBackground" ResourceKey="SystemControlPageBackgroundChromeLowBrush"/>
+                            <StaticResource x:Key="DataGridColumnHeaderForegroundBrush" ResourceKey="SystemControlForegroundBaseMediumBrush"/>
+                            <StaticResource x:Key="DataGridColumnHeaderBackgroundColor" ResourceKey="SystemAltHighColor"/>
+                            <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{StaticResource DataGridColumnHeaderBackgroundColor}"/>
+                            <StaticResource x:Key="DataGridColumnHeaderHoveredBackgroundColor" ResourceKey="SystemListLowColor"/>
+                            <StaticResource x:Key="DataGridColumnHeaderPressedBackgroundColor" ResourceKey="SystemListMediumColor"/>
+                            <StaticResource x:Key="DataGridColumnHeaderDraggedBackgroundBrush" ResourceKey="SystemControlBackgroundChromeMediumLowBrush"/>
+                            <StaticResource x:Key="DataGridColumnHeaderPointerOverBrush" ResourceKey="SystemControlHighlightListLowBrush"/>
+                            <StaticResource x:Key="DataGridColumnHeaderPressedBrush" ResourceKey="SystemControlHighlightListMediumBrush"/>
+                        </ResourceDictionary>
+                        <ResourceDictionary x:Key="Light">
+                            <SolidColorBrush x:Key="InvalidBrush" Color="#C50500"/>
+                            <SolidColorBrush x:Key="FillerGridLinesBrush" Color="Transparent"/>
+                            <SolidColorBrush x:Key="ScrollBarsSeparatorBackground" Color="{StaticResource SystemChromeMediumColor}" Opacity="0.9"/>
+                            <StaticResource x:Key="DataGridColumnHeaderForegroundBrush" ResourceKey="SystemControlForegroundBaseMediumBrush"/>
+                            <StaticResource x:Key="DataGridColumnHeaderBackgroundColor" ResourceKey="SystemAltHighColor"/>
+                            <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{StaticResource DataGridColumnHeaderBackgroundColor}"/>
+                            <StaticResource x:Key="DataGridColumnHeaderHoveredBackgroundColor" ResourceKey="SystemListLowColor"/>
+                            <StaticResource x:Key="DataGridColumnHeaderPressedBackgroundColor" ResourceKey="SystemListMediumColor"/>
+                            <StaticResource x:Key="DataGridColumnHeaderDraggedBackgroundBrush" ResourceKey="SystemControlBackgroundChromeMediumLowBrush"/>
+                            <StaticResource x:Key="DataGridColumnHeaderPointerOverBrush" ResourceKey="SystemControlHighlightListLowBrush"/>
+                            <StaticResource x:Key="DataGridColumnHeaderPressedBrush" ResourceKey="SystemControlHighlightListMediumBrush"/>
+                        </ResourceDictionary>
+                    </ResourceDictionary.ThemeDictionaries>
+
+                    <SolidColorBrush x:Key="SystemControlGridLinesBaseMediumLowBrush" Color="{StaticResource SystemBaseMediumLowColor}" Opacity="0.4"/>
+                    <SolidColorBrush x:Key="SystemControlRowGroupHeaderBackgroundMediumBrush" Color="{StaticResource SystemChromeMediumColor}"/>
+                    <SolidColorBrush x:Key="DataGridCurrencyVisualPrimaryBrush" Color="Transparent"/>
+
+                    <x:String x:Key="SortIconAscending">&#xE74A;</x:String>
+                    <x:String x:Key="SortIconDescending">&#xE74B;</x:String>
+                    <x:String x:Key="RowGroupHeaderIconClosed">&#xE0E3;</x:String>
+                    <x:String x:Key="RowGroupHeaderIconOpened">&#xE0E5;</x:String>
+
+                    <x:String x:Key="ScrollBarsSeparatorExpandBeginTime">00:00:00.40</x:String>
+                    <x:String x:Key="ScrollBarsSeparatorExpandDuration">00:00:00.1</x:String>
+                    <x:String x:Key="ScrollBarsSeparatorContractBeginTime">00:00:02.00</x:String>
+                    <x:String x:Key="ScrollBarsSeparatorContractDelay">00:00:02</x:String>
+                    <x:String x:Key="ScrollBarsSeparatorContractDuration">00:00:00.1</x:String>
+                    <x:String x:Key="ScrollBarsSeparatorContractFinalKeyframe">00:00:02.1</x:String>
+                    <x:String x:Key="ScrollBarsSeparatorNoTouchDuration">00:00:00.5</x:String>
+
+                    <x:Double x:Key="ListAccentLowOpacity">0.6</x:Double>
+                    <x:Double x:Key="ListAccentMediumOpacity">0.8</x:Double>
+
+                    <StaticResource x:Key="GridLinesBrush" ResourceKey="SystemControlGridLinesBaseMediumLowBrush"/>
+
+                    <StaticResource x:Key="DataGridDetailsPresenterBackgroundBrush" ResourceKey="SystemControlBackgroundChromeMediumLowBrush"/>
+                    <StaticResource x:Key="DataGridFillerColumnGridLinesBrush" ResourceKey="FillerGridLinesBrush"/>
+                    <StaticResource x:Key="DataGridRowSelectedBackgroundColor" ResourceKey="SystemAccentColor"/>
+                    <StaticResource x:Key="DataGridRowSelectedBackgroundOpacity" ResourceKey="ListAccentLowOpacity"/>
+                    <StaticResource x:Key="DataGridRowSelectedHoveredBackgroundColor" ResourceKey="SystemAccentColor"/>
+                    <StaticResource x:Key="DataGridRowSelectedHoveredBackgroundOpacity" ResourceKey="ListAccentMediumOpacity"/>
+                    <StaticResource x:Key="DataGridRowSelectedUnfocusedBackgroundColor" ResourceKey="SystemAccentColor"/>
+                    <StaticResource x:Key="DataGridRowSelectedUnfocusedBackgroundOpacity" ResourceKey="ListAccentLowOpacity"/>
+                    <StaticResource x:Key="DataGridRowSelectedHoveredUnfocusedBackgroundColor" ResourceKey="SystemAccentColor"/>
+                    <StaticResource x:Key="DataGridRowSelectedHoveredUnfocusedBackgroundOpacity" ResourceKey="ListAccentMediumOpacity"/>
+                    <StaticResource x:Key="DataGridRowHoveredBackgroundColor" ResourceKey="SystemListLowColor"/>
+                    <StaticResource x:Key="DataGridRowHeaderForegroundBrush" ResourceKey="SystemControlForegroundBaseMediumBrush"/>
+                    <StaticResource x:Key="DataGridRowHeaderBackgroundBrush" ResourceKey="SystemControlBackgroundAltHighBrush"/>
+                    <StaticResource x:Key="DataGridRowGroupHeaderBackgroundBrush" ResourceKey="SystemControlBackgroundChromeMediumBrush"/>
+                    <StaticResource x:Key="DataGridRowGroupHeaderHoveredBackgroundBrush" ResourceKey="SystemControlBackgroundListLowBrush"/>
+                    <StaticResource x:Key="DataGridRowGroupHeaderPressedBackgroundBrush" ResourceKey="SystemControlBackgroundListMediumBrush"/>
+                    <StaticResource x:Key="DataGridRowGroupHeaderForegroundBrush" ResourceKey="SystemControlForegroundBaseHighBrush"/>
+                    <StaticResource x:Key="DataGridRowInvalidBrush" ResourceKey="InvalidBrush"/>
+                    <StaticResource x:Key="DataGridCellBackgroundBrush" ResourceKey="SystemControlTransparentBrush"/>
+                    <StaticResource x:Key="DataGridCellFocusVisualPrimaryBrush" ResourceKey="SystemControlFocusVisualPrimaryBrush"/>
+                    <StaticResource x:Key="DataGridCellFocusVisualSecondaryBrush" ResourceKey="SystemControlFocusVisualSecondaryBrush"/>
+                    <StaticResource x:Key="DataGridCellInvalidBrush" ResourceKey="InvalidBrush"/>
+
+                    <Style TargetType="msControls:Border" x:Key="barChartBorder">
+                        <Setter Property="Width" Value="10"/>
+                        <Setter Property="Background" Value="SkyBlue"/>
+                    </Style>
+
+                    <Style TargetType="wctprimitives:DataGridColumnHeader" x:Key="barColumnStyle" >
+                        <Setter Property="Foreground" Value="{ThemeResource DataGridColumnHeaderForegroundBrush}"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        <Setter Property="IsTabStop" Value="False"/>
+                        <Setter Property="SeparatorBrush" Value="{ThemeResource GridLinesBrush}"/>
+                        <Setter Property="Padding" Value="2"/>
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="MinHeight" Value="32"/>
+                        <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="wctprimitives:DataGridColumnHeader">
+                                <Grid x:Name="ColumnHeaderRoot">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal">
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="BackgroundRectangle" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Duration="0" To="{ThemeResource DataGridColumnHeaderBackgroundColor}"/>
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="PointerOver">
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="BackgroundRectangle" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Duration="0" To="{ThemeResource DataGridColumnHeaderHoveredBackgroundColor}"/>
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="Pressed">
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="BackgroundRectangle" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Duration="0" To="{ThemeResource DataGridColumnHeaderPressedBackgroundColor}"/>
+                                                </Storyboard>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                        <VisualStateGroup x:Name="FocusStates">
+                                            <VisualState x:Name="Unfocused"/>
+                                            <VisualState x:Name="Focused">
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetName="FocusVisual" Storyboard.TargetProperty="Opacity" To="1" Duration="0"/>
+                                                </Storyboard>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                        <VisualStateGroup x:Name="SortStates">
+                                            <VisualState x:Name="Unsorted"/>
+                                            <VisualState x:Name="SortAscending">
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetName="SortIcon" Storyboard.TargetProperty="Opacity" Duration="0" To="1"/>
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="SortDescending">
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetName="SortIcon" Storyboard.TargetProperty="Opacity" Duration="0" To="1"/>
+                                                </Storyboard>
+                                                <VisualState.Setters>
+                                                    <Setter Target="SortIcon.Glyph" Value="{ThemeResource SortIconDescending}"/>
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Rectangle x:Name="BackgroundRectangle" Stretch="Fill" Fill="{ThemeResource DataGridColumnHeaderBackgroundBrush}" Grid.ColumnSpan="2"/>
+
+                                    <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition />
+                                                <!--<ColumnDefinition MinWidth="32" Width="Auto"/>-->
+                                        </Grid.RowDefinitions>
+
+                                        <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+                                        <FontIcon Grid.Row="1" x:Name="SortIcon" FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="{ThemeResource SortIconAscending}" FontSize="10"
+                                Foreground="{ThemeResource DataGridColumnHeaderForegroundBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0" Margin="0,0,0,0"/>
+                                    </Grid>
+                                    <Rectangle x:Name="VerticalSeparator" Grid.Column="1" Width="1" VerticalAlignment="Stretch" Fill="{TemplateBinding SeparatorBrush}" Visibility="{TemplateBinding SeparatorVisibility}"/>
+
+                                    <Grid x:Name="FocusVisual" IsHitTestVisible="False" Opacity="0">
+                                        <Rectangle x:Name="FocusVisualPrimary" Stroke="{ThemeResource DataGridCellFocusVisualPrimaryBrush}" StrokeThickness="2" Fill="Transparent"
+                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False"/>
+                                        <Rectangle x:Name="FocusVisualSecondary" Stroke="{ThemeResource DataGridCellFocusVisualSecondaryBrush}" StrokeThickness="1" Fill="Transparent"
+                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" Margin="2"/>
+                                    </Grid>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    </Style>
+                </ResourceDictionary>
+            </controls:DataGrid.Resources>
+            <controls:DataGrid.Columns>
+                <!--<controls:DataGridTextColumn Binding="{Binding BirdId, Mode=OneWay}" Tag="BirdId" Header="Bird Id" x:Name="Column0"/>-->
+                <controls:DataGridTextColumn Binding="{Binding CommonName, Mode=OneWay}" Tag="CommonName" Header="Common Name"/>
+                <controls:DataGridTextColumn Binding="{Binding ScientificName, Mode=OneWay}" Tag="ScientificName" Header="Scientific Name"/>
+                <controls:DataGridTemplateColumn Width="10" Header="Jan Q1" Tag="JanuaryQ1" Visibility="{x:Bind ViewModel.IsJanuaryVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Jan Q1"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding JanuaryQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Jan Q2" Tag="JanuaryQ2" Visibility="{x:Bind ViewModel.IsJanuaryVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Jan Q2"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding JanuaryQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Jan Q3" Tag="JanuaryQ3" Visibility="{x:Bind ViewModel.IsJanuaryVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Jan Q3"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding JanuaryQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Jan Q4" Tag="JanuaryQ4" Visibility="{x:Bind ViewModel.IsJanuaryVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Jan Q4"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding JanuaryQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Feb Q1" Tag="FebruaryQ1" Visibility="{x:Bind ViewModel.IsFebruaryVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Feb Q1"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding FebruaryQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Feb Q2" Tag="FebruaryQ2" Visibility="{x:Bind ViewModel.IsFebruaryVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Feb Q2"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding FebruaryQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Feb Q3" Tag="FebruaryQ3" Visibility="{x:Bind ViewModel.IsFebruaryVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Feb Q3"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding FebruaryQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Feb Q4" Tag="FebruaryQ4" Visibility="{x:Bind ViewModel.IsFebruaryVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Feb Q4"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding FebruaryQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Mar Q1" Tag="MarchQ1" Visibility="{x:Bind ViewModel.IsMarchVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Mar Q1"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding MarchQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Mar Q2" Tag="MarchQ2" Visibility="{x:Bind ViewModel.IsMarchVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Mar Q2"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding MarchQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Mar Q3" Tag="MarchQ3" Visibility="{x:Bind ViewModel.IsMarchVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Mar Q3"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding MarchQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Mar Q4" Tag="MarchQ4" Visibility="{x:Bind ViewModel.IsMarchVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Mar Q4"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding MarchQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Apr Q1" Tag="AprilQ1" Visibility="{x:Bind ViewModel.IsAprilVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Apr Q1"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding AprilQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Apr Q2" Tag="AprilQ2" Visibility="{x:Bind ViewModel.IsAprilVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Apr Q2"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding AprilQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Apr Q3" Tag="AprilQ3" Visibility="{x:Bind ViewModel.IsAprilVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Apr Q3"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding AprilQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Apr Q4" Tag="AprilQ4" Visibility="{x:Bind ViewModel.IsAprilVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Apr Q4"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding AprilQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="May Q1" Tag="MayQ1" Visibility="{x:Bind ViewModel.IsMayVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="May Q1"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding MayQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="May Q2" Tag="MayQ2" Visibility="{x:Bind ViewModel.IsMayVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="May Q2"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding MayQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="May Q3" Tag="MayQ3" Visibility="{x:Bind ViewModel.IsMayVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="May Q3"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding MayQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="May Q4" Tag="MayQ4" Visibility="{x:Bind ViewModel.IsMayVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="May Q4"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding MayQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Jun Q1" Tag="JuneQ1" Visibility="{x:Bind ViewModel.IsJuneVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Jun Q1"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding JuneQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Jun Q2" Tag="JuneQ2" Visibility="{x:Bind ViewModel.IsJuneVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Jun Q2"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding JuneQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Jun Q3" Tag="JuneQ3" Visibility="{x:Bind ViewModel.IsJuneVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Jun Q3"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding JuneQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Jun Q4" Tag="JuneQ4" Visibility="{x:Bind ViewModel.IsJuneVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Jun Q4"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding JuneQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Jul Q1" Tag="JulyQ1" Visibility="{x:Bind ViewModel.IsJulyVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Jul Q1"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding JulyQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Jul Q2" Tag="JulyQ2" Visibility="{x:Bind ViewModel.IsJulyVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Jul Q2"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding JulyQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Jul Q3" Tag="JulyQ3" Visibility="{x:Bind ViewModel.IsJulyVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Jul Q3"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding JulyQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Jul Q4" Tag="JulyQ4" Visibility="{x:Bind ViewModel.IsJulyVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Jul Q4"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding JulyQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Aug Q1" Tag="AugustQ1" Visibility="{x:Bind ViewModel.IsAugustVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Aug Q1"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding AugustQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Aug Q2" Tag="AugustQ2" Visibility="{x:Bind ViewModel.IsAugustVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Aug Q2"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding AugustQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Aug Q3" Tag="AugustQ3" Visibility="{x:Bind ViewModel.IsAugustVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Aug Q3"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding AugustQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Aug Q4" Tag="AugustQ4" Visibility="{x:Bind ViewModel.IsAugustVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Aug Q4"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding AugustQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Sep Q1" Tag="SeptemberQ1" Visibility="{x:Bind ViewModel.IsSeptemberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Sep Q1"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding SeptemberQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Sep Q2" Tag="SeptemberQ2" Visibility="{x:Bind ViewModel.IsSeptemberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Sep Q2"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding SeptemberQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Sep Q3" Tag="SeptemberQ3" Visibility="{x:Bind ViewModel.IsSeptemberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Sep Q3"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding SeptemberQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Sep Q4" Tag="SeptemberQ4" Visibility="{x:Bind ViewModel.IsSeptemberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Sep Q4"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding SeptemberQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Oct Q1" Tag="OctoberQ1" Visibility="{x:Bind ViewModel.IsOctoberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Oct Q1"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding OctoberQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Oct Q2" Tag="OctoberQ2" Visibility="{x:Bind ViewModel.IsOctoberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Oct Q2"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding OctoberQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Oct Q3" Tag="OctoberQ3" Visibility="{x:Bind ViewModel.IsOctoberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Oct Q3"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding OctoberQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Oct Q4" Tag="OctoberQ4" Visibility="{x:Bind ViewModel.IsOctoberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Oct Q4"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding OctoberQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Nov Q1" Tag="NovemberQ1" Visibility="{x:Bind ViewModel.IsNovemberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Nov Q1"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding NovemberQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Nov Q2" Tag="NovemberQ2" Visibility="{x:Bind ViewModel.IsNovemberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Nov Q2"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding NovemberQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Nov Q3" Tag="NovemberQ3" Visibility="{x:Bind ViewModel.IsNovemberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Nov Q3"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding NovemberQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Nov Q4" Tag="NovemberQ4" Visibility="{x:Bind ViewModel.IsNovemberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Nov Q4"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding NovemberQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Dec Q1" Tag="DecemberQ1" Visibility="{x:Bind ViewModel.IsDecemberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Dec Q1"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding DecemberQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Dec Q2" Tag="DecemberQ2" Visibility="{x:Bind ViewModel.IsDecemberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Dec Q2"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding DecemberQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Dec Q3" Tag="DecemberQ3" Visibility="{x:Bind ViewModel.IsDecemberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Dec Q3"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding DecemberQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn Width="10" Header="Dec Q4" Tag="DecemberQ4" Visibility="{x:Bind ViewModel.IsDecemberVisible, Mode=OneWay}">
+                    <controls:DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="wctprimitives:DataGridColumnHeader" BasedOn="{StaticResource barColumnStyle}">
+                            <Setter Property="ToolTipService.ToolTip" Value="Dec Q4"/>
+                        </Style>
+                    </controls:DataGridTemplateColumn.HeaderStyle>
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Height="{Binding DecemberQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                
+            </controls:DataGrid.Columns>
+        </controls:DataGrid>
+        <controls:DataGrid
+            Background="#08888888"
+            Grid.Row="1"
+            AutoGenerateColumns="False"
+            AlternatingRowBackground="#11888888"
+            HorizontalScrollBarVisibility="Visible"
+            VerticalScrollBarVisibility="Visible"
+            HeadersVisibility="Column"
+            CanUserSortColumns="True"
+            GridLinesVisibility="All"
+            Visibility="{x:Bind ViewModel.DataGridBarChartMode, Mode=OneWay, Converter={StaticResource HistogramViewTypeComparisonConverter}, ConverterParameter=Values}"
+            ItemsSource="{x:Bind ViewModel.ItemsSource, Mode=OneWay}"
             IsReadOnly="True"
             Sorting="DataGrid_Sorting"
             LoadingRowGroup="dg_loadingRowGroup" 
