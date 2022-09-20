@@ -49,84 +49,144 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
     public bool IsJanuaryVisible
     {
         get => isJanuaryVisible;
-        set => SetProperty(ref isJanuaryVisible, value);
+        set
+        {
+            SetProperty(ref isJanuaryVisible, value);
+            OnPropertyChanged(nameof(IsJanuaryVisibleValues));
+            OnPropertyChanged(nameof(IsJanuaryVisibleBars));
+        }
     }
 
     private bool isFebruaryVisible = true;
     public bool IsFebruaryVisible
     {
         get => isFebruaryVisible;
-        set => SetProperty(ref isFebruaryVisible, value);
+        set
+        {
+            SetProperty(ref isFebruaryVisible, value);
+            OnPropertyChanged(nameof(IsFebruaryVisibleValues));
+            OnPropertyChanged(nameof(IsFebruaryVisibleBars));
+        }
     }
 
     private bool isMarchVisible = true;
     public bool IsMarchVisible
     {
         get => isMarchVisible;
-        set => SetProperty(ref isMarchVisible, value);
+        set
+        {
+            SetProperty(ref isMarchVisible, value);
+            OnPropertyChanged(nameof(IsMarchVisibleValues));
+            OnPropertyChanged(nameof(IsMarchVisibleBars));
+        }
     }
 
     private bool isAprilVisible = true;
     public bool IsAprilVisible
     {
         get => isAprilVisible;
-        set => SetProperty(ref isAprilVisible, value);
+        set
+        {
+            SetProperty(ref isAprilVisible, value);
+            OnPropertyChanged(nameof(IsAprilVisibleValues));
+            OnPropertyChanged(nameof(IsAprilVisibleBars));
+        }
     }
 
     private bool isMayVisible = true;
     public bool IsMayVisible
     {
         get => isMayVisible;
-        set => SetProperty(ref isMayVisible, value);
+        set
+        {
+            SetProperty(ref isMayVisible, value);
+            OnPropertyChanged(nameof(IsMayVisibleValues));
+            OnPropertyChanged(nameof(IsMayVisibleBars));
+        }
     }
 
     private bool isJuneVisible = true;
     public bool IsJuneVisible
     {
         get => isJuneVisible;
-        set => SetProperty(ref isJuneVisible, value);
+        set
+        {
+            SetProperty(ref isJuneVisible, value);
+            OnPropertyChanged(nameof(IsJuneVisibleValues));
+            OnPropertyChanged(nameof(IsJuneVisibleBars));
+        }
     }
 
     private bool isJulyVisible = true;
     public bool IsJulyVisible
     {
         get => isJulyVisible;
-        set => SetProperty(ref isJulyVisible, value);
+        set
+        {
+            SetProperty(ref isJulyVisible, value);
+            OnPropertyChanged(nameof(IsJulyVisibleValues));
+            OnPropertyChanged(nameof(IsJulyVisibleBars));
+        }
     }
 
     private bool isAugustVisible = true;
     public bool IsAugustVisible
     {
         get => isAugustVisible;
-        set => SetProperty(ref isAugustVisible, value);
+        set
+        {
+            SetProperty(ref isAugustVisible, value);
+            OnPropertyChanged(nameof(IsAugustVisibleValues));
+            OnPropertyChanged(nameof(IsAugustVisibleBars));
+        }
     }
 
     private bool isSeptemberVisible = true;
     public bool IsSeptemberVisible
     {
         get => isSeptemberVisible;
-        set => SetProperty(ref isSeptemberVisible, value);
+        set
+        {
+            SetProperty(ref isSeptemberVisible, value);
+            OnPropertyChanged(nameof(IsSeptemberVisibleValues));
+            OnPropertyChanged(nameof(IsSeptemberVisibleBars));
+        }
     }
 
     private bool isOctoberVisible = true;
     public bool IsOctoberVisible
     {
         get => isOctoberVisible;
-        set => SetProperty(ref isOctoberVisible, value);
+        set
+        {
+            SetProperty(ref isOctoberVisible, value);
+            OnPropertyChanged(nameof(IsOctoberVisibleValues));
+            OnPropertyChanged(nameof(IsOctoberVisibleBars));
+        }
     }
 
     private bool isNovemberVisible = true;
     public bool IsNovemberVisible
     {
         get => isNovemberVisible;
-        set => SetProperty(ref isNovemberVisible, value);
+        set
+        {
+            SetProperty(ref isNovemberVisible, value);
+            OnPropertyChanged(nameof(IsNovemberVisibleValues));
+            OnPropertyChanged(nameof(IsNovemberVisibleBars));
+        }
     }
 
     private bool isDecemberVisible = true;
     public bool IsDecemberVisible
     {
         get => isDecemberVisible;
-        set => SetProperty(ref isDecemberVisible, value);
+        set
+        {
+            SetProperty(ref isDecemberVisible, value);
+            OnPropertyChanged(nameof(IsDecemberVisibleValues));
+            OnPropertyChanged(nameof(IsDecemberVisibleBars));
+        }
     }
 
     private bool? areAllMonthsVisible = true;
@@ -136,12 +196,67 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
         set => SetProperty(ref areAllMonthsVisible, value);
     }
 
-    private HistogramViewType isDataGridBarChartMode = HistogramViewType.Values;
+    private HistogramViewType dataGridBarChartMode = HistogramViewType.Values;
     public HistogramViewType DataGridBarChartMode
     {
-        get => isDataGridBarChartMode;
-        set => SetProperty(ref isDataGridBarChartMode, value);
+        get => dataGridBarChartMode;
+        set
+        {
+            SetProperty(ref dataGridBarChartMode, value);
+
+            OnPropertyChanged(nameof(IsJanuaryVisibleValues));
+            OnPropertyChanged(nameof(IsFebruaryVisibleValues));
+            OnPropertyChanged(nameof(IsMarchVisibleValues));
+            OnPropertyChanged(nameof(IsAprilVisibleValues));
+            OnPropertyChanged(nameof(IsMayVisibleValues));
+            OnPropertyChanged(nameof(IsJuneVisibleValues));
+            OnPropertyChanged(nameof(IsJulyVisibleValues));
+            OnPropertyChanged(nameof(IsAugustVisibleValues));
+            OnPropertyChanged(nameof(IsSeptemberVisibleValues));
+            OnPropertyChanged(nameof(IsOctoberVisibleValues));
+            OnPropertyChanged(nameof(IsNovemberVisibleValues));
+            OnPropertyChanged(nameof(IsDecemberVisibleValues));
+
+            OnPropertyChanged(nameof(IsJanuaryVisibleBars));
+            OnPropertyChanged(nameof(IsFebruaryVisibleBars));
+            OnPropertyChanged(nameof(IsMarchVisibleBars));
+            OnPropertyChanged(nameof(IsAprilVisibleBars));
+            OnPropertyChanged(nameof(IsMayVisibleBars));
+            OnPropertyChanged(nameof(IsJuneVisibleBars));
+            OnPropertyChanged(nameof(IsJulyVisibleBars));
+            OnPropertyChanged(nameof(IsAugustVisibleBars));
+            OnPropertyChanged(nameof(IsSeptemberVisibleBars));
+            OnPropertyChanged(nameof(IsOctoberVisibleBars));
+            OnPropertyChanged(nameof(IsNovemberVisibleBars));
+            OnPropertyChanged(nameof(IsDecemberVisibleBars));
+        }
     }
+
+    public bool IsJanuaryVisibleValues => IsJanuaryVisible && (DataGridBarChartMode == HistogramViewType.Values);
+    public bool IsFebruaryVisibleValues => IsFebruaryVisible && (DataGridBarChartMode == HistogramViewType.Values);
+    public bool IsMarchVisibleValues => IsMarchVisible && (DataGridBarChartMode == HistogramViewType.Values);
+    public bool IsAprilVisibleValues => IsAprilVisible && (DataGridBarChartMode == HistogramViewType.Values);
+    public bool IsMayVisibleValues => IsMayVisible && (DataGridBarChartMode == HistogramViewType.Values);
+    public bool IsJuneVisibleValues => IsJuneVisible && (DataGridBarChartMode == HistogramViewType.Values);
+    public bool IsJulyVisibleValues => IsJulyVisible && (DataGridBarChartMode == HistogramViewType.Values);
+    public bool IsAugustVisibleValues => IsAugustVisible && (DataGridBarChartMode == HistogramViewType.Values);
+    public bool IsSeptemberVisibleValues => IsSeptemberVisible && (DataGridBarChartMode == HistogramViewType.Values);
+    public bool IsOctoberVisibleValues => IsOctoberVisible && (DataGridBarChartMode == HistogramViewType.Values);
+    public bool IsNovemberVisibleValues => IsNovemberVisible && (DataGridBarChartMode == HistogramViewType.Values);
+    public bool IsDecemberVisibleValues => IsDecemberVisible && (DataGridBarChartMode == HistogramViewType.Values);
+
+    public bool IsJanuaryVisibleBars => IsJanuaryVisible && (DataGridBarChartMode == HistogramViewType.Bars);
+    public bool IsFebruaryVisibleBars => IsFebruaryVisible && (DataGridBarChartMode == HistogramViewType.Bars);
+    public bool IsMarchVisibleBars => IsMarchVisible && (DataGridBarChartMode == HistogramViewType.Bars);
+    public bool IsAprilVisibleBars => IsAprilVisible && (DataGridBarChartMode == HistogramViewType.Bars);
+    public bool IsMayVisibleBars => IsMayVisible && (DataGridBarChartMode == HistogramViewType.Bars);
+    public bool IsJuneVisibleBars => IsJuneVisible && (DataGridBarChartMode == HistogramViewType.Bars);
+    public bool IsJulyVisibleBars => IsJulyVisible && (DataGridBarChartMode == HistogramViewType.Bars);
+    public bool IsAugustVisibleBars => IsAugustVisible && (DataGridBarChartMode == HistogramViewType.Bars);
+    public bool IsSeptemberVisibleBars => IsSeptemberVisible && (DataGridBarChartMode == HistogramViewType.Bars);
+    public bool IsOctoberVisibleBars => IsOctoberVisible && (DataGridBarChartMode == HistogramViewType.Bars);
+    public bool IsNovemberVisibleBars => IsNovemberVisible && (DataGridBarChartMode == HistogramViewType.Bars);
+    public bool IsDecemberVisibleBars => IsDecemberVisible && (DataGridBarChartMode == HistogramViewType.Bars);
 
     private string dataGridModeLabel = "Grid";
     public string DataGridModeLabel
