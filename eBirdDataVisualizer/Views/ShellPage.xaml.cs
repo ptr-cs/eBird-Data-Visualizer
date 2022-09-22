@@ -1,4 +1,5 @@
-﻿using eBirdDataVisualizer.Contracts.Services;
+﻿using System.Diagnostics;
+using eBirdDataVisualizer.Contracts.Services;
 using eBirdDataVisualizer.Helpers;
 using eBirdDataVisualizer.ViewModels;
 
@@ -83,5 +84,22 @@ public sealed partial class ShellPage : Page
         var result = navigationService.GoBack();
 
         args.Handled = result;
+    }
+
+    private void NavigationFrame_Navigating(object sender, Microsoft.UI.Xaml.Navigation.NavigatingCancelEventArgs e)
+    {
+        //ViewModel.ShowProgress = true;
+    }
+
+    private void NavigationFrame_Navigated(object sender, Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
+    {
+        Debug.WriteLine("done");
+        ViewModel.ShowProgress = false;
+    }
+
+    private void NavigationViewItem_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        Debug.WriteLine("pressed");
+        ViewModel.ShowProgress = true;
     }
 }

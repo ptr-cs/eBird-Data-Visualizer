@@ -5,7 +5,9 @@ using CommunityToolkit.Mvvm.Input;
 using eBirdDataVisualizer.Core.Services;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
+using Windows.Storage;
 using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
 
 namespace eBirdDataVisualizer.ViewModels;
 
@@ -44,9 +46,22 @@ public class MainViewModel : ObservableRecipient
         set => SetProperty(ref importResultSymbol, value);
     }
 
+    public async void LoadSampleData()
+    {
+        var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/sample_US-HI__1900_2022_1_12_barchart.txt"));
+        if (file is not null)
+        {
+            parseFileMetadata(file);
+            var text = System.IO.File.ReadAllText(file.Path);
+            await _birdDataService.ParseData(text);
+        }
+    }
+
     public MainViewModel(IBirdDataService birdDataService)
     {
         _birdDataService = birdDataService;
+
+        LoadSampleData();
 
         ImportHistogramDataCommand = new RelayCommand(async () =>
         {
@@ -57,6 +72,11 @@ public class MainViewModel : ObservableRecipient
         {
             ShowImportResult = false;
         });
+    }
+
+    public void parseFileMetadata(StorageFile file)
+    {
+        _birdDataService.ParseMetadata(file.Name);
     }
 
     public async Task spawnFilePicker()
@@ -74,6 +94,8 @@ public class MainViewModel : ObservableRecipient
             var importResult = false;
             try
             {
+                parseFileMetadata(file);
+
                 var text = await Windows.Storage.FileIO.ReadTextAsync(file);
                 importResult = await _birdDataService.ParseData(text);
                 if (importResult)

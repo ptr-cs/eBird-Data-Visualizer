@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using eBirdDataVisualizer.Core.Models;
@@ -12,9 +13,12 @@ namespace eBirdDataVisualizer.Core.Services;
 
 public interface IBirdDataService
 {
-    public Task<IEnumerable<Bird>> GetGridDataAsync();
+    public Task<IEnumerable<Bird>> GetBirdDataAsync();
+    public Task<IEnumerable<MonthData>> GetMonthDataAsync();
+    public Task<DataSourceMetadata> GetMetadataAsync();
     public void ClearData();
     public Task<bool> ParseData(string data);
+    public Task ParseMetadata(string name);
 }
 
 public class BirdDataService : IBirdDataService
@@ -30,7 +34,20 @@ public class BirdDataService : IBirdDataService
     static DataColumn JanuaryQ3 = new DataColumn(nameof(JanuaryQ3), typeof(double));
     static DataColumn JanuaryQ4 = new DataColumn(nameof(JanuaryQ4), typeof(double));
 
+    static DataTable Months = new DataTable(nameof(Months));
+    static DataColumn Month = new DataColumn(nameof(Month), typeof(Month));
+    static DataColumn SampleSizes = new DataColumn(nameof(SampleSizes), typeof(List<double>));
+
+    static DataTable Metadata = new DataTable(nameof(Metadata));
+    static DataColumn Name = new DataColumn(nameof(Name), typeof(string));
+    static DataColumn YearStart = new DataColumn(nameof(YearStart), typeof(int));
+    static DataColumn YearEnd = new DataColumn(nameof(YearEnd), typeof(int));
+    static DataColumn MonthStart = new DataColumn(nameof(MonthStart), typeof(Month));
+    static DataColumn MonthEnd = new DataColumn(nameof(MonthEnd), typeof(Month));
+    static DataColumn Location = new DataColumn(nameof(Location), typeof(string));
+
     private static List<Bird> allBirds = new List<Bird>();
+    private static List<MonthData> allMonths = new List<MonthData>();
 
     static BirdDataService()
     {
@@ -43,31 +60,54 @@ public class BirdDataService : IBirdDataService
         Birds.Columns.Add(JanuaryQ3);
         Birds.Columns.Add(JanuaryQ4);
 
-        Birds.Rows.Add(0, "Black-bellied Whistling-Duck", "Dendrocygna autumnalis", new List<double>() { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.655E-4, 2.082E-4, 4.693E-4, 4.624E-4, 8.357E-4, 9.092E-4, 8.3E-5, 0.0012603, 0.0012944, 4.97E-5, 0.0015, 0.0010597, 4.18E-4, 7.671E-4, 1.218E-4, 6.09E-5, 0.0, 0.0, 0.0019542, 0.0, 4.4E-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
+        Months.Columns.Add(Month);
+        Months.Columns.Add(SampleSizes);
 
-        Birds.Rows.Add(3, "West Indian Whistling-Duck", "Dendrocygna arborea", new List<double>() { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0015, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
-
-        Birds.Rows.Add(4, "Fulvous Whistling-Duck", "Dendrocygna bicolor", new List<double>() { 0.0015, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0015, 0.0, 0.0015, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0015, 3.95E-5, 0.0015, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0015, 0.0015, 0.0015, 0.0015, 0.0, 0.0, 0.0, 0.0, 0.0015, 0.0015, 0.0, 0.0015, 0.0, 0.0015, 0.0, 0.0, 0.0015 });
-
-        Birds.Rows.Add(1, "Emu", "Dromaius novaehollandiae", new List<double>() { 0.0, 0.0, 0.0, 0.0, 4.44E-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
-
-        Birds.Rows.Add(2, "Snow Goose", "Anser caerulescens", new List<double>() { 0.0164127, 0.0130752, 0.0147944, 0.0115589, 0.0134523, 0.0070272, 0.0060272, 0.0100091, 0.0097213, 0.0075751, 0.0053493, 0.0031462, 0.0010052, 6.83E-4, 6.52E-4, 4.76E-4, 4.164E-4, 7.41E-5, 3.391E-4, 2.279E-4, 1.186E-4, 8.3E-5, 1.8E-4, 0.0, 1.491E-4, 5.39E-5, 5.89E-5, 4.18E-5, 1.18E-4, 1.828E-4, 1.218E-4, 7.95E-5, 2.555E-4, 6.514E-4, 9.051E-4, 0.0011868, 0.0010745, 0.0026718, 0.0040783, 0.0059102, 0.0064931, 0.0110383, 0.0122762, 0.0232245, 0.0200967, 0.0151272, 0.0184791, 0.030209 });
-
-        Birds.Rows.Add(5, "Barnacle Goose", "Branta leucopsis", new List<double>() { 3.17E-5, 4.22E-5, 4.12E-5, 0.0015, 3.108E-4, 5.69E-5, 3.57E-5, 0.0015, 0.0015, 1.209E-4, 1.207E-4, 0.0015, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0015, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.205E-4, 5.19E-5, 0.0 });
-
-        Birds.Rows.Add(5, "Egyptian Goose", "Alopochen aegyptiaca", new List<double>() { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0015, 0.0, 0.0, 0.0, 0.0, 0.0, 4.152E-4, 1.35E-4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.97E-5, 5.11E-5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.48E-5, 0.0, 0.0, 0.0, 0.0 });
+        Metadata.Columns.Add(Name);
+        Metadata.Columns.Add(Location);
+        Metadata.Columns.Add(YearStart);
+        Metadata.Columns.Add(YearEnd);
+        Metadata.Columns.Add(MonthStart);
+        Metadata.Columns.Add(MonthEnd);
 
         DataSet.Tables.Add(Birds);
-    }
-
-    public BirdDataService()
-    {
-
+        DataSet.Tables.Add(Months);
+        DataSet.Tables.Add(Metadata);
     }
 
     public void ClearData()
     {
-        DataSet.Clear();
+        for (int i = 0; i < DataSet.Tables.Count; ++i)
+            DataSet.Tables[i].Rows.Clear();
+    }
+
+    private static DataSourceMetadata AllMetadata()
+    {
+        DataSourceMetadata metadata = new DataSourceMetadata();
+        foreach (DataRow row in DataSet.Tables[DataSet.Tables.IndexOf(Metadata)].Rows)
+        {
+            metadata.Name = (string)row[Name];
+            metadata.YearStart = (int)row[YearStart];
+            metadata.YearEnd = (int)row[YearEnd];
+            metadata.MonthStart = (Month)row[MonthStart];
+            metadata.MonthEnd = (Month)row[MonthEnd];
+            metadata.Location = (string)row[Location];
+        }
+        return metadata;
+    }
+
+    private static IEnumerable<MonthData> AllMonths()
+    {
+        List<MonthData> months = new List<MonthData>();
+        foreach (DataRow row in DataSet.Tables[DataSet.Tables.IndexOf(Months)].Rows)
+        {
+            months.Add(new MonthData()
+            {
+                Month = (Month)row[Month],
+                SampleSizes = (List<double>)row[SampleSizes]
+            });
+        }
+        return months;
     }
 
     private static IEnumerable<Bird> AllBirds()
@@ -81,7 +121,6 @@ public class BirdDataService : IBirdDataService
                 BirdId = (int)row[BirdId],
                 CommonName = (string)row[CommonName],
                 ScientificName = (string)row[ScientificName],
-                Frequency = frequency,
                 JanuaryQ1 = (double)frequency[0],
                 JanuaryQ2 = (double)frequency[1],
                 JanuaryQ3 = (double)frequency[2],
@@ -135,7 +174,7 @@ public class BirdDataService : IBirdDataService
         return birds;
     }
 
-    public async Task<IEnumerable<Bird>> GetGridDataAsync()
+    public async Task<IEnumerable<Bird>> GetBirdDataAsync()
     {
         allBirds = new List<Bird>(AllBirds());
 
@@ -143,8 +182,31 @@ public class BirdDataService : IBirdDataService
         return allBirds;
     }
 
+    public async Task<IEnumerable<MonthData>> GetMonthDataAsync()
+    {
+        allMonths = new List<MonthData>(AllMonths());
+
+        await Task.CompletedTask;
+        return allMonths;
+    }
+
+    public async Task<DataSourceMetadata> GetMetadataAsync()
+    {
+        var data = AllMetadata();
+        await Task.CompletedTask;
+        return data;
+    }
+
+    /// <summary>
+    /// Parse data loaded from an eBird barchart .txt file.
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
     public async Task<bool> ParseData(string data)
     {
+        //Months.Rows.Clear();
+        //Birds.Rows.Clear();
+
         const string frequencyKey = "Frequency of observations in the selected location(s)";
         const string numberTaxaKey = "Number of taxa";
         const string sampleSizeKey = "Sample Size";
@@ -153,11 +215,37 @@ public class BirdDataService : IBirdDataService
 
         try
         {
-            // Parse the histogram data text:
+            // Parse the monthly sample-size data: 
+            var sampleSizes = data.Trim().Split('\n') // split text into lines
+                .Where(l => l != String.Empty) // skip empty lines
+                .SkipWhile(l => !l.Contains(sampleSizeKey)).First()  // skip forward to the line containing sample size data
+                .Split('\t')  // separate the line by the value delimiter
+                .Where(v => v != String.Empty && Double.TryParse(v, out _))  // exclude empty items and non-numeric values
+                .Select(v => System.Convert.ToDouble(v)).ToList(); // cast the remaining items to doubles and return as list
+
+            // Parse the histogram data for bird entries:
             var lines = data.Trim().Split('\n') // split text into lines
-                .Where(l => l != "") // skip empty lines
+                .Where(l => l != String.Empty) // skip empty lines
                 .SkipWhile(l => !l.Contains(sampleSizeKey)) // skip forward to the line containing sample size data
                 .Skip(1).ToList(); // skip the sample size data line; subsequent lines should be bird entries
+
+            Months.Rows.Clear();
+            Birds.Rows.Clear();
+
+            int monthCounter = 0;
+            List<double> samples = new List<double>();
+            for (var i = 0; i < sampleSizes.Count() + 1; ++i)
+            {
+                if (i > 0 && i % 4 == 0)
+                {
+                    Months.Rows.Add((Month)Enum.GetValues(typeof(Month)).GetValue(monthCounter), samples);
+                    monthCounter++;
+                    samples = new List<double>();
+                }
+                if (i < sampleSizes.Count())
+                    samples.Add(sampleSizes[i]);
+            }
+
             for (var i = 0; i < lines.Count(); ++i)
             {
                 // the common name appears first in the data entry:
@@ -166,7 +254,7 @@ public class BirdDataService : IBirdDataService
                 var scientificNameSplit = commonNameSplit.Last().Split("</em>)");
                 var commonName = commonNameSplit.First();
                 var scientificName = scientificNameSplit.First();
-                var frequencyData = scientificNameSplit.Last().Trim().Split('\t').Where(x => x != "").Select(x => System.Convert.ToDouble(x)).ToList();
+                var frequencyData = scientificNameSplit.Last().Trim().Split('\t').Where(x => x != String.Empty).Select(x => System.Convert.ToDouble(x)).ToList();
 
                 Birds.Rows.Add(i, commonName, scientificName, frequencyData);
             }
@@ -180,5 +268,31 @@ public class BirdDataService : IBirdDataService
 
         await Task.CompletedTask;
         return importResult;
+    }
+
+    public async Task ParseMetadata(string name)
+    {
+        var yearStart = 0;
+        var yearEnd = 0;
+        var monthStart = Models.Month.January;
+        var monthEnd = Models.Month.January;
+        var location = name.Split("__").First().Split('_').Last();
+        var timeInfo = name.Split("__").Last().Split("barchart.txt").First().Split('_').Where(x => x != String.Empty);
+        if (timeInfo.Count() == 4)
+        {
+            try
+            {
+                yearStart = int.Parse(timeInfo.ElementAt(0));
+                yearEnd = int.Parse(timeInfo.ElementAt(1));
+                monthStart = (Month)(int.Parse(timeInfo.ElementAt(2)) - 1);
+                monthEnd = (Month)(int.Parse(timeInfo.ElementAt(3)) - 1);
+            }
+            catch (Exception) { }
+        }
+
+        Metadata.Rows.Clear();
+        Metadata.Rows.Add(name, location, yearStart, yearEnd, monthStart, monthEnd);
+        await Task.CompletedTask;
+        return;
     }
 }

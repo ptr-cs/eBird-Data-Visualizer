@@ -16,22 +16,6 @@ using Microsoft.UI.Xaml.Data;
 
 namespace eBirdDataVisualizer.ViewModels;
 
-public enum Month
-{
-    January = 0,
-    February = 1,
-    March = 2,
-    April = 3,
-    May = 4,
-    June = 5,
-    July = 6,
-    August = 7,
-    September = 8,
-    October = 9,
-    November = 10,
-    December = 11
-}
-
 public enum HistogramViewType
 {
     Values= 0,
@@ -44,6 +28,58 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
 
     public ObservableCollection<Bird> BirdsCollection { get; set; } = new ObservableCollection<Bird>();
     public CollectionViewSource BirdsCollectionViewSource { get; set; }
+
+    public ObservableCollection<MonthData> MonthsCollection { get; set; } = new ObservableCollection<MonthData>();
+
+    public Guid id { get; set; }
+
+    private string dataSourceName = "default";
+    public string DataSourceName
+    {
+        get => dataSourceName;
+        set => SetProperty(ref dataSourceName, value);
+    }
+
+    private string dataSourceLocation = "abc";
+    public string DataSourceLocation
+    {
+        get => dataSourceLocation;
+        set => SetProperty(ref dataSourceLocation, value);
+    }
+
+    private int dataSourceYearStart = 0;
+    public int DataSourceYearStart
+    {
+        get => dataSourceYearStart;
+        set => SetProperty(ref dataSourceYearStart, value);
+    }
+
+    private int dataSourceYearEnd = 0;
+    public int DataSourceYearEnd
+    {
+        get => dataSourceYearEnd;
+        set => SetProperty(ref dataSourceYearEnd, value);
+    }
+
+    private Month dataSourceMonthStart = 0;
+    public Month DataSourceMonthStart
+    {
+        get => dataSourceMonthStart;
+        set => SetProperty(ref dataSourceMonthStart, value);
+    }
+
+    private Month dataSourceMonthEnd = 0;
+    public Month DataSourceMonthEnd
+    {
+        get => dataSourceMonthEnd;
+        set => SetProperty(ref dataSourceMonthEnd, value);
+    }
+
+    public void NotifyDataSourceMetadataChanged(string s)
+    {
+        DataSourceName = s;
+        OnPropertyChanged(nameof(DataSourceName));
+    }
 
     private bool isJanuaryVisible = true;
     public bool IsJanuaryVisible
@@ -196,6 +232,9 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
         set => SetProperty(ref areAllMonthsVisible, value);
     }
 
+    public bool IsHistogramViewTypeValues => (DataGridBarChartMode == HistogramViewType.Values) ? true : false;
+    public bool IsHistogramViewTypeBars => (DataGridBarChartMode == HistogramViewType.Bars) ? true : false;
+
     private HistogramViewType dataGridBarChartMode = HistogramViewType.Values;
     public HistogramViewType DataGridBarChartMode
     {
@@ -229,6 +268,9 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
             OnPropertyChanged(nameof(IsOctoberVisibleBars));
             OnPropertyChanged(nameof(IsNovemberVisibleBars));
             OnPropertyChanged(nameof(IsDecemberVisibleBars));
+
+            OnPropertyChanged(nameof(IsHistogramViewTypeValues));
+            OnPropertyChanged(nameof(IsHistogramViewTypeBars));
         }
     }
 
@@ -270,6 +312,13 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
     {
         get => itemsSource;
         set => SetProperty(ref itemsSource, value);
+    }
+
+    private ICollectionView monthDataSource;
+    public ICollectionView MonthDataSource
+    {
+        get => monthDataSource;
+        set => SetProperty(ref monthDataSource, value);
     }
 
     public ICommand GroupByGenusCommand
@@ -333,6 +382,7 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
 
     public DataGridViewModel(IBirdDataService birdDataService)
     {
+        id = Guid.NewGuid();
         _birdDataService = birdDataService;
         BirdsCollectionViewSource = new CollectionViewSource() { Source = BirdsCollection };
 
@@ -453,7 +503,15 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
         ToggleDataGridBarChartMode = new RelayCommand<HistogramViewType>((param) =>
         {
             DataGridBarChartMode = param;
+            //ShowProgress = false;
         });
+    }
+
+    private bool showProgress = false;
+    public bool ShowProgress
+    {
+        get => showProgress;
+        set => SetProperty(ref showProgress, value);
     }
 
     // Sorting implementation using LINQ
@@ -469,28 +527,55 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
     public string CachedGroupQuery
     {
         get => _cachedGroupQuery;
-        set => _cachedGroupQuery = value;
+        set
+        {
+            SetProperty(ref _cachedGroupQuery, value);
+            OnPropertyChanged(nameof(IsGroupedByGenus));
+            OnPropertyChanged(nameof(IsGroupedByCommonName));
+        }
     }
+
+    public bool IsGroupedByGenus => (CachedGroupQuery == nameof(KeySelectorGenus)) ? true : false;
+    public bool IsGroupedByCommonName => (CachedGroupQuery == nameof(KeySelectorCommonName)) ? true : false;
 
     public async void OnNavigatedTo(object parameter)
     {
         BirdsCollection.Clear();
 
-        // TODO: Replace with real data.
-        var data = await _birdDataService.GetGridDataAsync();
+        var birdData = await _birdDataService.GetBirdDataAsync();
 
-        foreach (var item in data)
+        foreach (var item in birdData)
         {
             BirdsCollection.Add(item);
         }
         BirdsCollectionViewSource = new CollectionViewSource() { Source = BirdsCollection };
         ItemsSource = BirdsCollectionViewSource.View;
+
+        MonthsCollection.Clear();
+
+        var monthData = await _birdDataService.GetMonthDataAsync();
+
+        foreach (var item in monthData)
+        {
+            MonthsCollection.Add(item);
+        }
+
+        var metadata = await _birdDataService.GetMetadataAsync();
+        DataSourceName = metadata.Name;
+        DataSourceLocation = metadata.Location;
+        DataSourceYearStart = metadata.YearStart;
+        DataSourceYearEnd = metadata.YearEnd;
+        DataSourceMonthStart = metadata.MonthStart;
+        DataSourceMonthEnd = metadata.MonthEnd;
     }
 
     public void CreateDefaultView()
     {
         BirdsCollectionViewSource = new CollectionViewSource() { Source = BirdsCollection };
         ItemsSource = BirdsCollectionViewSource.View;
+
+        //MonthsCollectionViewSource = new CollectionViewSource() { Source = MonthsCollection };
+        //MonthDataSource = MonthsCollectionViewSource.View;
     }
 
     public void OnNavigatedFrom()
@@ -536,6 +621,7 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
             collectionViewSource.Source = new ObservableCollection<Bird>(BirdsCollection.OrderBy(bird => propertyInfo.GetValue(bird, null)));
         else
             collectionViewSource.Source = new ObservableCollection<Bird>(BirdsCollection.OrderByDescending(bird => propertyInfo.GetValue(bird, null)));
+
         return collectionViewSource;
     }
 
