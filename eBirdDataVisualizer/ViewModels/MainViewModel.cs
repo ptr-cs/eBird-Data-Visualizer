@@ -51,7 +51,7 @@ public class MainViewModel : ObservableRecipient
         var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/sample_US-HI__1900_2022_1_12_barchart.txt"));
         if (file is not null)
         {
-            parseFileMetadata(file);
+            await _birdDataService.ParseMetadata(file.Name);
             var text = System.IO.File.ReadAllText(file.Path);
             await _birdDataService.ParseData(text);
         }
@@ -74,12 +74,7 @@ public class MainViewModel : ObservableRecipient
         });
     }
 
-    public void parseFileMetadata(StorageFile file)
-    {
-        _birdDataService.ParseMetadata(file.Name);
-    }
-
-    public async Task spawnFilePicker()
+    public async Task<bool?> spawnFilePicker()
     {
         FileOpenPicker fileOpenPicker = new();
         fileOpenPicker.FileTypeFilter.Add("*");
@@ -89,15 +84,19 @@ public class MainViewModel : ObservableRecipient
 
         var file = await fileOpenPicker.PickSingleFileAsync();
 
+        bool? result = false;
+
         if (file is not null)
         {
             var importResult = false;
             try
             {
-                parseFileMetadata(file);
+                await _birdDataService.ParseMetadata(file.Name);
 
                 var text = await Windows.Storage.FileIO.ReadTextAsync(file);
                 importResult = await _birdDataService.ParseData(text);
+                result = importResult;
+
                 if (importResult)
                     ImportResultText = $"{file.Name} successfully imported!";
                 else
@@ -116,5 +115,6 @@ public class MainViewModel : ObservableRecipient
 
             ShowImportResult = true;
         }
+        return result;
     }
 }

@@ -270,15 +270,15 @@ public class BirdDataService : IBirdDataService
         return importResult;
     }
 
-    public async Task ParseMetadata(string name)
+    public async Task ParseMetadata(string filename)
     {
         var yearStart = 0;
         var yearEnd = 0;
         var monthStart = Models.Month.January;
         var monthEnd = Models.Month.January;
-        var location = name.Split("__").First().Split('_').Last();
-        var timeInfo = name.Split("__").Last().Split("barchart.txt").First().Split('_').Where(x => x != String.Empty);
-        if (timeInfo.Count() == 4)
+        var location = filename.Split("__").First().Split('_').Last();
+        var timeInfo = filename.Split("__").Last().Split('_').Where(x => x != String.Empty);
+        if (timeInfo.Count() >= 4)
         {
             try
             {
@@ -291,7 +291,7 @@ public class BirdDataService : IBirdDataService
         }
 
         Metadata.Rows.Clear();
-        Metadata.Rows.Add(name, location, yearStart, yearEnd, monthStart, monthEnd);
+        Metadata.Rows.Add(filename, location, yearStart, yearEnd, monthStart, monthEnd);
         await Task.CompletedTask;
         return;
     }

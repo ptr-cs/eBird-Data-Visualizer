@@ -13,9 +13,6 @@
     <Grid>
         <StackPanel
             x:Name="ContentArea">
-            <Button x:Name="ClearSampleDataButton" Command="{x:Bind ViewModel.ClearBirdDataCommand}">
-                <TextBlock Text="Clear Sample Data " FontSize="16" Padding="8" FontWeight="Bold"/>
-            </Button>
             <TextBlock x:Uid="Settings_Personalization" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,16,0,0" />
             <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
                 <TextBlock x:Uid="Settings_Theme" />

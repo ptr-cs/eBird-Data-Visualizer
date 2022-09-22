@@ -81,7 +81,7 @@
                 <AppBarButton.Flyout>
                     <Flyout>
                         <RadioButtons>
-                            <RadioButton Content="Genus" Command="{x:Bind ViewModel.GroupByGenusCommand}" IsChecked="{x:Bind ViewModel.IsGroupedByGenus, Mode=OneWay}"/>
+                            <RadioButton Content="Genus" Command="{x:Bind ViewModel.GroupByGenusCommand}" IsChecked="{x:Bind ViewModel.IsGroupedByGenus, Mode=OneWay}" />
                             <RadioButton Content="Common Name" Command="{x:Bind ViewModel.GroupByCommonNameCommand}" IsChecked="{x:Bind ViewModel.IsGroupedByCommonName, Mode=OneWay}"/>
                         </RadioButtons>
                     </Flyout>
@@ -108,10 +108,12 @@
                     </Flyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
+            <AppBarButton Icon="OpenFile" Label="Import" Command="{x:Bind ViewModel.ImportFile, Mode=OneWay}" />
             <AppBarButton Icon="Save" Label="Export">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
                         <MenuFlyoutItem Text="CSV ..." Icon="Download"/>
+                        <MenuFlyoutItem Text="JSON ..." Icon="Download"/>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
@@ -240,9 +242,9 @@
                     <StaticResource x:Key="DataGridCellFocusVisualSecondaryBrush" ResourceKey="SystemControlFocusVisualSecondaryBrush"/>
                     <StaticResource x:Key="DataGridCellInvalidBrush" ResourceKey="InvalidBrush"/>
 
-                    <Style TargetType="msControls:Border" x:Key="barChartBorder">
+                    <Style TargetType="Rectangle" x:Key="barChartBorder">
                         <Setter Property="Width" Value="10"/>
-                        <Setter Property="Background" Value="{ThemeResource BarChartBrush}"/>
+                        <Setter Property="Fill" Value="{ThemeResource BarChartBrush}"/>
                     </Style>
 
                     <Style TargetType="wctprimitives:DataGridColumnHeader" x:Key="barColumnStyle" >
@@ -345,7 +347,6 @@
                 </ResourceDictionary>
             </controls:DataGrid.Resources>
             <controls:DataGrid.Columns>
-                <!--<controls:DataGridTextColumn Binding="{Binding BirdId, Mode=OneWay}" Tag="BirdId" Header="Bird Id" x:Name="Column0"/>-->
                 <controls:DataGridTextColumn Binding="{Binding CommonName, Mode=OneWay}" Tag="CommonName" Header="Common Name"/>
                 <controls:DataGridTextColumn Binding="{Binding ScientificName, Mode=OneWay}" Tag="ScientificName" Header="Scientific Name"/>
 
@@ -357,9 +358,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding JanuaryQ1, Mode=OneWay}">
-                                <Border Height="{Binding JanuaryQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding JanuaryQ1, Mode=OneWay}" Height="{Binding JanuaryQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -371,9 +370,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding JanuaryQ2, Mode=OneWay}">
-                                <Border Height="{Binding JanuaryQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding JanuaryQ2, Mode=OneWay}" Height="{Binding JanuaryQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -385,9 +382,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding JanuaryQ3, Mode=OneWay}">
-                                <Border Height="{Binding JanuaryQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding JanuaryQ3, Mode=OneWay}" Height="{Binding JanuaryQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -399,9 +394,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding JanuaryQ4, Mode=OneWay}">
-                                <Border Height="{Binding JanuaryQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding JanuaryQ4, Mode=OneWay}" Height="{Binding JanuaryQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -413,9 +406,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding FebruaryQ1, Mode=OneWay}">
-                                <Border Height="{Binding FebruaryQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding FebruaryQ1, Mode=OneWay}" Height="{Binding FebruaryQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -427,9 +418,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding FebruaryQ2, Mode=OneWay}">
-                                <Border Height="{Binding FebruaryQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding FebruaryQ2, Mode=OneWay}" Height="{Binding FebruaryQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -441,9 +430,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding FebruaryQ3, Mode=OneWay}">
-                                <Border Height="{Binding FebruaryQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding FebruaryQ3, Mode=OneWay}" Height="{Binding FebruaryQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -455,9 +442,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding FebruaryQ4, Mode=OneWay}">
-                                <Border Height="{Binding FebruaryQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding FebruaryQ4, Mode=OneWay}" Height="{Binding FebruaryQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -469,9 +454,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding MarchQ1, Mode=OneWay}">
-                                <Border Height="{Binding MarchQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding MarchQ1, Mode=OneWay}" Height="{Binding MarchQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -483,9 +466,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding MarchQ2, Mode=OneWay}">
-                                <Border Height="{Binding MarchQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding MarchQ2, Mode=OneWay}" Height="{Binding MarchQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -497,9 +478,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding MarchQ3, Mode=OneWay}">
-                                <Border Height="{Binding MarchQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding MarchQ3, Mode=OneWay}" Height="{Binding MarchQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -511,9 +490,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding MarchQ4, Mode=OneWay}">
-                                <Border Height="{Binding MarchQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding MarchQ4, Mode=OneWay}" Height="{Binding MarchQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -525,9 +502,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding AprilQ1, Mode=OneWay}">
-                                <Border Height="{Binding AprilQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding AprilQ1, Mode=OneWay}" Height="{Binding AprilQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -539,9 +514,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding AprilQ2, Mode=OneWay}">
-                                <Border Height="{Binding AprilQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding AprilQ2, Mode=OneWay}" Height="{Binding AprilQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -553,9 +526,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding AprilQ3, Mode=OneWay}">
-                                <Border Height="{Binding AprilQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding AprilQ3, Mode=OneWay}" Height="{Binding AprilQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -567,9 +538,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding AprilQ4, Mode=OneWay}">
-                                <Border Height="{Binding AprilQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding AprilQ4, Mode=OneWay}" Height="{Binding AprilQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -581,9 +550,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding MayQ1, Mode=OneWay}">
-                                <Border Height="{Binding MayQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding MayQ1, Mode=OneWay}" Height="{Binding MayQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -595,9 +562,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding MayQ2, Mode=OneWay}">
-                                <Border Height="{Binding MayQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding MayQ2, Mode=OneWay}" Height="{Binding MayQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -609,9 +574,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding MayQ3, Mode=OneWay}">
-                                <Border Height="{Binding MayQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding MayQ3, Mode=OneWay}" Height="{Binding MayQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -623,9 +586,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding MayQ4, Mode=OneWay}">
-                                <Border Height="{Binding MayQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding MayQ4, Mode=OneWay}" Height="{Binding MayQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -637,9 +598,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding JuneQ1, Mode=OneWay}">
-                                <Border Height="{Binding JuneQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding JuneQ1, Mode=OneWay}" Height="{Binding JuneQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -651,9 +610,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding JuneQ2, Mode=OneWay}">
-                                <Border Height="{Binding JuneQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding JuneQ2, Mode=OneWay}" Height="{Binding JuneQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -665,9 +622,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding JuneQ3, Mode=OneWay}">
-                                <Border Height="{Binding JuneQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding JuneQ3, Mode=OneWay}" Height="{Binding JuneQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -679,9 +634,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding JuneQ4, Mode=OneWay}">
-                                <Border Height="{Binding JuneQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding JuneQ4, Mode=OneWay}" Height="{Binding JuneQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -693,9 +646,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding JulyQ1, Mode=OneWay}">
-                                <Border Height="{Binding JulyQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding JulyQ1, Mode=OneWay}" Height="{Binding JulyQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -707,9 +658,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding JulyQ2, Mode=OneWay}">
-                                <Border Height="{Binding JulyQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding JulyQ2, Mode=OneWay}" Height="{Binding JulyQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -721,9 +670,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding JulyQ3, Mode=OneWay}">
-                                <Border Height="{Binding JulyQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding JulyQ3, Mode=OneWay}" Height="{Binding JulyQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -735,9 +682,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding JulyQ4, Mode=OneWay}">
-                                <Border Height="{Binding JulyQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding JulyQ4, Mode=OneWay}" Height="{Binding JulyQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -749,9 +694,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding AugustQ1, Mode=OneWay}">
-                                <Border Height="{Binding AugustQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding AugustQ1, Mode=OneWay}" Height="{Binding AugustQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -763,9 +706,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding AugustQ2, Mode=OneWay}">
-                                <Border Height="{Binding AugustQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding AugustQ2, Mode=OneWay}" Height="{Binding AugustQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -777,9 +718,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding AugustQ3, Mode=OneWay}">
-                                <Border Height="{Binding AugustQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding AugustQ3, Mode=OneWay}" Height="{Binding AugustQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -791,9 +730,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding AugustQ4, Mode=OneWay}">
-                                <Border Height="{Binding AugustQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding AugustQ4, Mode=OneWay}" Height="{Binding AugustQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -805,9 +742,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding SeptemberQ1, Mode=OneWay}">
-                                <Border Height="{Binding SeptemberQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding SeptemberQ1, Mode=OneWay}" Height="{Binding SeptemberQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -819,9 +754,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding SeptemberQ2, Mode=OneWay}">
-                                <Border Height="{Binding SeptemberQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding SeptemberQ2, Mode=OneWay}" Height="{Binding SeptemberQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -833,9 +766,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding SeptemberQ3, Mode=OneWay}">
-                                <Border Height="{Binding SeptemberQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding SeptemberQ3, Mode=OneWay}" Height="{Binding SeptemberQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -847,9 +778,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding SeptemberQ4, Mode=OneWay}">
-                                <Border Height="{Binding SeptemberQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding SeptemberQ4, Mode=OneWay}" Height="{Binding SeptemberQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -861,9 +790,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding OctoberQ1, Mode=OneWay}">
-                                <Border Height="{Binding OctoberQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding OctoberQ1, Mode=OneWay}" Height="{Binding OctoberQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -875,9 +802,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding OctoberQ2, Mode=OneWay}">
-                                <Border Height="{Binding OctoberQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding OctoberQ2, Mode=OneWay}" Height="{Binding OctoberQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -889,9 +814,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding OctoberQ3, Mode=OneWay}">
-                                <Border Height="{Binding OctoberQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding OctoberQ3, Mode=OneWay}" Height="{Binding OctoberQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -903,9 +826,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding OctoberQ4, Mode=OneWay}">
-                                <Border Height="{Binding OctoberQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding OctoberQ4, Mode=OneWay}" Height="{Binding OctoberQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -917,9 +838,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding NovemberQ1, Mode=OneWay}">
-                                <Border Height="{Binding NovemberQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding NovemberQ1, Mode=OneWay}" Height="{Binding NovemberQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -931,9 +850,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding NovemberQ2, Mode=OneWay}">
-                                <Border Height="{Binding NovemberQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding NovemberQ2, Mode=OneWay}" Height="{Binding NovemberQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -945,9 +862,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding NovemberQ3, Mode=OneWay}">
-                                <Border Height="{Binding NovemberQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding NovemberQ3, Mode=OneWay}" Height="{Binding NovemberQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -959,9 +874,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding NovemberQ4, Mode=OneWay}">
-                                <Border Height="{Binding NovemberQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding NovemberQ4, Mode=OneWay}" Height="{Binding NovemberQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -973,9 +886,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding DecemberQ1, Mode=OneWay}">
-                                <Border Height="{Binding DecemberQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding DecemberQ1, Mode=OneWay}" Height="{Binding DecemberQ1, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -987,9 +898,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding DecemberQ2, Mode=OneWay}">
-                                <Border Height="{Binding DecemberQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding DecemberQ2, Mode=OneWay}" Height="{Binding DecemberQ2, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -1001,9 +910,7 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding DecemberQ3, Mode=OneWay}">
-                                <Border Height="{Binding DecemberQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding DecemberQ3, Mode=OneWay}" Height="{Binding DecemberQ3, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
@@ -1015,12 +922,11 @@
                     </controls:DataGridTemplateColumn.HeaderStyle>
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource InvisibleHitTestBorder}" ToolTipService.ToolTip="{Binding DecemberQ4, Mode=OneWay}">
-                                <Border Height="{Binding DecemberQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
-                            </Border>
+                            <Rectangle ToolTipService.ToolTip="{Binding DecemberQ4, Mode=OneWay}" Height="{Binding DecemberQ4, Mode=OneWay, Converter={StaticResource BarChartValueHeightConverter}}" Style="{StaticResource barChartBorder}"/>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
+
 
                 <controls:DataGridTextColumn Binding="{Binding JanuaryQ1, Mode=OneWay}" Header="{x:Bind ViewModel.MonthsCollection[0].Q1String, Mode=OneWay}" Tag="{x:Bind ViewModel.MonthsCollection[0].Q1Tag, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsJanuaryVisibleValues, Mode=OneWay}"/>
                 <controls:DataGridTextColumn Binding="{Binding JanuaryQ2, Mode=OneWay}" Header="{x:Bind ViewModel.MonthsCollection[0].Q2String, Mode=OneWay}" Tag="{x:Bind ViewModel.MonthsCollection[0].Q2Tag, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsJanuaryVisibleValues, Mode=OneWay}"/>
@@ -1073,6 +979,6 @@
             </controls:DataGrid.Columns>
         </controls:DataGrid>
 
-        <ProgressRing x:Name="NavigationProgressRing" IsActive="{x:Bind ViewModel.ShowProgress, Mode=OneWay}" Height="128" Width="128" Grid.RowSpan="3" />
+        <ProgressRing x:Name="myRing" IsActive="{x:Bind ViewModel.ShowProgress, Mode=OneWay}" Height="128" Width="128" Grid.RowSpan="3" />
     </Grid>
 </Page>

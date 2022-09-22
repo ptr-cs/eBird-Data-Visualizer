@@ -13,6 +13,7 @@ using eBirdDataVisualizer.Core.Models;
 using eBirdDataVisualizer.Core.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
+using static System.Net.WebRequestMethods;
 
 namespace eBirdDataVisualizer.ViewModels;
 
@@ -346,6 +347,11 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
         get;
     }
 
+    public ICommand ImportFile
+    {
+        get;
+    }
+
     private static CollectionViewSource groupedItems;
 
     public bool MonthsAllVisible()
@@ -505,6 +511,18 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
             DataGridBarChartMode = param;
             //ShowProgress = false;
         });
+
+        ImportFile = new RelayCommand(async () =>
+        {
+            ShowProgress = true;
+            var mvm = App.GetService<MainViewModel>();
+            var importResult = await mvm.spawnFilePicker();
+            if (importResult.Value == true)
+            {
+                LoadData();
+            }
+            ShowProgress = false;
+        });
     }
 
     private bool showProgress = false;
@@ -540,6 +558,11 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
 
     public async void OnNavigatedTo(object parameter)
     {
+        LoadData();
+    }
+
+    public async void LoadData()
+    {
         BirdsCollection.Clear();
 
         var birdData = await _birdDataService.GetBirdDataAsync();
@@ -551,7 +574,7 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
         BirdsCollectionViewSource = new CollectionViewSource() { Source = BirdsCollection };
         ItemsSource = BirdsCollectionViewSource.View;
 
-        MonthsCollection.Clear();
+        MonthsCollection = new ObservableCollection<MonthData>();
 
         var monthData = await _birdDataService.GetMonthDataAsync();
 
@@ -603,19 +626,6 @@ public class DataGridViewModel : ObservableRecipient, INavigationAware
             collectionViewSource.Source = BirdsCollection;
             return collectionViewSource;
         }
-
-        //if (CachedGroupQuery != string.Empty)
-        //{
-        //    switch (CachedGroupQuery)
-        //    {
-        //        case nameof(KeySelectorGenus):
-        //            return GroupDataByGenus();
-        //        case nameof(KeySelectorCommonName):
-        //            return GroupDataByCommonName();
-        //        default:
-        //            break;
-        //    }
-        //}
 
         if (ascending)
             collectionViewSource.Source = new ObservableCollection<Bird>(BirdsCollection.OrderBy(bird => propertyInfo.GetValue(bird, null)));

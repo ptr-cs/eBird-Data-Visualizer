@@ -34,10 +34,10 @@ public class MonthData : IComparable
         get; set;
     }
 
-    public string Q1String => $"{Month} Q1: {SampleSizes.ElementAt(0)}";
-    public string Q2String => $"{Month} Q2: {SampleSizes.ElementAt(1)}";
-    public string Q3String => $"{Month} Q3: {SampleSizes.ElementAt(2)}";
-    public string Q4String => $"{Month} Q4: {SampleSizes.ElementAt(3)}";
+    public string Q1String => (SampleSizes.Count > 0) ? $"{Month} Q1: {SampleSizes.ElementAt(0)}" : $"{Month} Q1";
+    public string Q2String => (SampleSizes.Count > 1) ? $"{Month} Q2: {SampleSizes.ElementAt(1)}" : $"{Month} Q2";
+    public string Q3String => (SampleSizes.Count > 2) ? $"{Month} Q3: {SampleSizes.ElementAt(2)}" : $"{Month} Q3";
+    public string Q4String => (SampleSizes.Count > 3) ? $"{Month} Q4: {SampleSizes.ElementAt(3)}" : $"{Month} Q4";
 
     public string Q1Tag => $"{Month}Q1";
     public string Q2Tag => $"{Month}Q2";

@@ -7,6 +7,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using System.ComponentModel;
 using CommunityToolkit.WinUI.UI;
+using System;
+using Windows.UI.Core;
+using Microsoft.UI.Dispatching;
 
 namespace eBirdDataVisualizer.Views;
 
@@ -76,6 +79,16 @@ public sealed partial class DataGridPage : Page
 
     private void DataGrid_Sorting(object sender, DataGridColumnEventArgs e)
     {
+        //DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+
+        //Task.Run(() =>
+        //{
+        //    dispatcherQueue.TryEnqueue(() =>
+        //    {
+
+        //    });
+        //});
+        ViewModel.ShowProgress = true;
         DataGrid dg = (DataGrid)sender;
 
         // Clear previous sorted column if we start sorting a different column
@@ -111,6 +124,8 @@ public sealed partial class DataGridPage : Page
                 e.Column.SortDirection = null;
             }
         }
+
+        ViewModel.ShowProgress = false;
     }
 
     //Handle the LoadingRowGroup event to alter the grouped header property value to be displayed
@@ -133,5 +148,10 @@ public sealed partial class DataGridPage : Page
                 e.RowGroupHeader.PropertyValue = "Group";
                 break;
         }
+    }
+
+    private void RadioButton_Click(object sender, RoutedEventArgs e)
+    {
+        ViewModel.ShowProgress = true;
     }
 }
